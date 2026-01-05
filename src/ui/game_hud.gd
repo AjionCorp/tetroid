@@ -20,11 +20,12 @@ var p2_blocks_label: Label
 
 func _ready() -> void:
 	# Fill screen
-	anchor_right = 1.0
-	anchor_bottom = 1.0
+	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE  # Don't block game input
 	
 	_create_hud()
+	
+	print("HUD created successfully")
 
 func _create_hud() -> void:
 	"""Create HUD elements programmatically"""

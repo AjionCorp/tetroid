@@ -47,20 +47,10 @@ func _create_visuals() -> void:
 	trail.z_index = -1
 	add_child(trail)
 
-func _physics_process(delta: float) -> void:
-	"""Update ball physics"""
-	if not is_active:
-		return
-	
-	# Move ball
-	var movement = velocity * delta
-	position += movement
-	
-	# Update trail
+func _process(_delta: float) -> void:
+	"""Update ball visuals"""
+	# Physics handled by BallPhysics system
 	_update_trail()
-	
-	# Check boundaries
-	_check_boundaries()
 
 func _update_trail() -> void:
 	"""Update trail effect"""
@@ -70,43 +60,6 @@ func _update_trail() -> void:
 		# Limit trail length
 		if trail.get_point_count() > 10:
 			trail.remove_point(0)
-
-func _check_boundaries() -> void:
-	"""Check if ball hit screen boundaries"""
-	var board_width = Constants.BOARD_WIDTH * Constants.CELL_SIZE
-	var board_height = Constants.BOARD_HEIGHT * Constants.CELL_SIZE
-	
-	# Left/Right walls - bounce
-	if position.x < 0:
-		position.x = 0
-		velocity.x = abs(velocity.x)
-	elif position.x > board_width:
-		position.x = board_width
-		velocity.x = -abs(velocity.x)
-	
-	# Top/Bottom - missed ball
-	if position.y < -20:
-		# Player 1 missed (ball went off top)
-		emit_signal("ball_missed", 1)
-		_respawn_center()
-	elif position.y > board_height + 20:
-		# Player 2 missed (ball went off bottom)
-		emit_signal("ball_missed", 2)
-		_respawn_center()
-
-func _respawn_center() -> void:
-	"""Respawn ball at center"""
-	var board_width = Constants.BOARD_WIDTH * Constants.CELL_SIZE
-	var board_height = Constants.BOARD_HEIGHT * Constants.CELL_SIZE
-	
-	position = Vector2(board_width / 2, board_height / 2)
-	
-	# Random direction
-	var angle = randf_range(-PI/4, PI/4)  # -45 to +45 degrees
-	if randf() > 0.5:
-		angle += PI  # Flip direction
-	
-	velocity = Vector2(cos(angle), sin(angle)) * speed
 
 func bounce(normal: Vector2) -> void:
 	"""Bounce ball off surface"""

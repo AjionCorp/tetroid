@@ -1,245 +1,163 @@
 ## Main Game Class
 ##
-## Manages the complete game state and coordinates all systems
+## Orchestrates all game systems in a modular way
 class_name Game
-extends Node2D
+extends CanvasLayer
 
-## Game systems
+## Core systems
 var game_state: GameState
-var input_system
+var board_manager: BoardManager
+var ball_physics: BallPhysics
+var input_system: InputSystem
 var deployment_ai: DeploymentAI
+
+## UI
 var game_hud: GameHUD
 
 ## Entities
-var blocks: Array = []
-var ball
-var player1_paddle
-var player2_paddle
+var ball: Ball
+var player_paddle: Paddle  # Bottom paddle (human)
+var ai_paddle: Paddle      # Top paddle (AI)
 
-## Player pieces to place
-var player1_pieces: Array = []
-var player2_pieces: Array = []
-var player1_current_piece_index: int = 0
-
-## Deployment placement preview
-var placement_preview
-
-## Delta accumulator for fixed timestep
-var _delta_accumulator: float = 0.0
+## Player data
+var player_pieces: Array = []
+var ai_pieces: Array = []
+var current_piece_index: int = 0
 
 func _ready() -> void:
-	print("Game instance created")
+	print("Game initialized")
 
 func start() -> void:
-	"""Start the game"""
-	print("Starting game match...")
+	"""Start a new game match"""
+	print("=== Starting New Match ===")
 	
-	# Create game state manager
-	game_state = GameState.new()
-	add_child(game_state)
-	_connect_game_state_signals()
-	
-	# Initialize input system
-	input_system = InputSystem.new()
-	add_child(input_system)
-	_connect_input_signals()
-	
-	# Create game world
-	_create_world()
-	
-	# Create HUD
-	game_hud = GameHUD.new()
-	add_child(game_hud)
-	
-	# Create players
-	_create_players()
+	# Initialize systems in order
+	_initialize_game_state()
+	_initialize_board()
+	_initialize_input()
+	_initialize_hud()
+	_initialize_players()
 	
 	# Start deployment phase
-	_start_deployment_phase()
+	_start_deployment()
 	
-	print("Game started!")
+	print("=== Match Started ===")
 
-func _connect_game_state_signals() -> void:
-	"""Connect to game state signals"""
+func _initialize_game_state() -> void:
+	"""Initialize game state manager"""
+	game_state = GameState.new()
+	add_child(game_state)
+	
+	# Connect signals
 	game_state.phase_changed.connect(_on_phase_changed)
-	game_state.deployment_time_changed.connect(_on_deployment_time_changed)
+	game_state.deployment_time_changed.connect(_on_deployment_timer_update)
 	game_state.hp_changed.connect(_on_hp_changed)
 	game_state.score_changed.connect(_on_score_changed)
 	game_state.match_ended.connect(_on_match_ended)
+	
+	print("✓ Game state initialized")
 
-func _connect_input_signals() -> void:
-	"""Connect input system signals"""
-	input_system.action_pressed.connect(_on_action_pressed)
+func _initialize_board() -> void:
+	"""Initialize board manager"""
+	board_manager = BoardManager.new()
+	add_child(board_manager)
+	print("✓ Board created (60x62)")
+
+func _initialize_input() -> void:
+	"""Initialize input system"""
+	input_system = InputSystem.new()
+	add_child(input_system)
+	
 	input_system.paddle_moved.connect(_on_paddle_moved)
+	print("✓ Input system ready")
 
-func _create_world() -> void:
-	"""Create the game world programmatically"""
-	print("Creating game world...")
-	
-	# Create background
-	var bg = ColorRect.new()
-	bg.color = Constants.COLOR_BG_DARK
-	bg.size = Vector2(
-		Constants.BOARD_WIDTH * Constants.CELL_SIZE,
-		Constants.BOARD_HEIGHT * Constants.CELL_SIZE
-	)
-	bg.z_index = -100
-	add_child(bg)
-	
-	# Create board grid visualization
-	_create_board_grid()
-	
-	print("Game world created")
+func _initialize_hud() -> void:
+	"""Initialize game HUD"""
+	game_hud = GameHUD.new()
+	add_child(game_hud)
+	print("✓ HUD initialized")
 
-func _create_board_grid() -> void:
-	"""Create visual grid for the board"""
-	var grid = Node2D.new()
-	grid.name = "BoardGrid"
-	add_child(grid)
+func _initialize_players() -> void:
+	"""Initialize player paddles"""
+	# Human player paddle (BOTTOM)
+	player_paddle = Paddle.new()
+	player_paddle.initialize(1, 57 * board_manager.cell_size)
+	board_manager.add_child(player_paddle)
 	
-	# Draw grid lines (subtle)
-	for x in range(Constants.BOARD_WIDTH + 1):
-		if x % 5 == 0:  # Only every 5th line
-			var line = Line2D.new()
-			line.add_point(Vector2(x * Constants.CELL_SIZE, 0))
-			line.add_point(Vector2(x * Constants.CELL_SIZE, Constants.BOARD_HEIGHT * Constants.CELL_SIZE))
-			line.default_color = Color(Constants.COLOR_PANEL_DARK, 0.3)
-			line.width = 1
-			grid.add_child(line)
+	# AI paddle (TOP)
+	ai_paddle = Paddle.new()
+	ai_paddle.initialize(2, 5 * board_manager.cell_size)
+	board_manager.add_child(ai_paddle)
 	
-	for y in range(Constants.BOARD_HEIGHT + 1):
-		if y % 5 == 0:  # Only every 5th line
-			var line = Line2D.new()
-			line.add_point(Vector2(0, y * Constants.CELL_SIZE))
-			line.add_point(Vector2(Constants.BOARD_WIDTH * Constants.CELL_SIZE, y * Constants.CELL_SIZE))
-			line.default_color = Color(Constants.COLOR_PANEL_DARK, 0.3)
-			line.width = 1
-			grid.add_child(line)
-	
-	# Neutral zone - just a line
-	var neutral_line = Line2D.new()
-	var neutral_y = (Constants.BOARD_HEIGHT / 2) * Constants.CELL_SIZE
-	neutral_line.add_point(Vector2(0, neutral_y))
-	neutral_line.add_point(Vector2(Constants.BOARD_WIDTH * Constants.CELL_SIZE, neutral_y))
-	neutral_line.default_color = Constants.COLOR_ACCENT
-	neutral_line.width = 3
-	grid.add_child(neutral_line)
+	print("✓ Paddles created (Human=bottom, AI=top)")
 
-func _create_players() -> void:
-	"""Create player paddles"""
-	# Player 1 paddle (BOTTOM - human player)
-	player1_paddle = Paddle.new()
-	player1_paddle.initialize(1, 57 * Constants.CELL_SIZE)
-	add_child(player1_paddle)
+func _start_deployment() -> void:
+	"""Start deployment phase"""
+	# Generate random pieces
+	player_pieces = _generate_random_pieces(5)
+	ai_pieces = _generate_random_pieces(5)
+	current_piece_index = 0
 	
-	# Player 2 paddle (TOP - AI/opponent)
-	player2_paddle = Paddle.new()
-	player2_paddle.initialize(2, 5 * Constants.CELL_SIZE)
-	add_child(player2_paddle)
-	
-	print("Players created (P1=bottom, P2=top)")
-
-func _start_deployment_phase() -> void:
-	"""Start the deployment phase"""
-	print("=== DEPLOYMENT PHASE ===")
-	
-	# Generate random pieces for each player
-	player1_pieces = _generate_random_pieces(5)
-	player2_pieces = _generate_random_pieces(5)
-	
-	print("Player 1 pieces: " + str(player1_pieces))
-	print("Player 2 pieces: " + str(player2_pieces))
+	print("Your pieces: " + str(player_pieces))
+	print("Click anywhere to place piece: " + player_pieces[0])
 	
 	# Start game state
 	game_state.start_deployment()
 	
-	# Initialize AI
+	# Initialize AI deployment
 	deployment_ai = DeploymentAI.new()
 	deployment_ai.player_id = 2
 	deployment_ai.ai_place_block.connect(_on_ai_place_block)
 	add_child(deployment_ai)
-	deployment_ai.start_deployment(player2_pieces)
-	
-	# Show instructions
-	print("=== YOU are at the BOTTOM, AI is at the TOP ===")
-	print("Click ANYWHERE on board to place your 5 blocks!")
-	print("(Cannot place on neutral line)")
-	print("Current piece: " + player1_pieces[0])
+	deployment_ai.start_deployment(ai_pieces)
 
 func _generate_random_pieces(count: int) -> Array:
 	"""Generate random Tetris pieces"""
 	var pieces = []
-	var all_types = BlockData.get_all_piece_types()
+	var all_types = ["I_PIECE", "O_PIECE", "T_PIECE", "S_PIECE", "Z_PIECE", "J_PIECE", "L_PIECE"]
 	
 	for i in range(count):
-		var random_type = all_types[randi() % all_types.size()]
-		pieces.append(random_type)
+		pieces.append(all_types[randi() % all_types.size()])
 	
 	return pieces
 
-func _process(delta: float) -> void:
-	"""Main game loop"""
-	# Fixed timestep for physics
-	_delta_accumulator += delta
-	
-	while _delta_accumulator >= Constants.FIXED_DELTA:
-		_fixed_update(Constants.FIXED_DELTA)
-		_delta_accumulator -= Constants.FIXED_DELTA
-
-func _fixed_update(delta: float) -> void:
-	"""Fixed timestep update"""
-	# Update all blocks
-	for block in blocks:
-		if is_instance_valid(block):
-			block._process(delta)
-
 func _input(event: InputEvent) -> void:
-	"""Handle input events"""
-	if event is InputEventMouseButton:
-		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+	"""Handle mouse clicks for block placement"""
+	if event is InputEventMouseButton and event.pressed:
+		if event.button_index == MOUSE_BUTTON_LEFT:
 			if game_state.current_phase == GameState.Phase.DEPLOYMENT:
-				_handle_deployment_click(event.position)
+				_handle_click_placement(event.position)
 
-func _handle_deployment_click(click_pos: Vector2) -> void:
-	"""Handle clicking to place block during deployment"""
+func _handle_click_placement(click_pos: Vector2) -> void:
+	"""Handle clicking to place block"""
 	if not game_state.can_place_block(1):
 		print("No more blocks to place!")
 		return
 	
-	# Convert screen position to grid position
-	var grid_x = int(click_pos.x / Constants.CELL_SIZE)
-	var grid_y = int(click_pos.y / Constants.CELL_SIZE)
-	var grid_pos = Vector2i(grid_x, grid_y)
+	# Convert to grid position
+	var grid_pos = board_manager.screen_to_grid(click_pos)
 	
-	# Check if in neutral zone (can't place there)
-	if Constants.is_in_neutral_zone(grid_y):
-		print("Cannot place in neutral zone!")
+	# Validate position
+	if not board_manager.is_position_valid(grid_pos):
+		print("Invalid position! (Out of bounds or neutral zone)")
 		return
 	
-	# Check bounds
-	if grid_x < 0 or grid_x >= Constants.BOARD_WIDTH or grid_y < 0 or grid_y >= Constants.BOARD_HEIGHT:
-		print("Out of bounds!")
-		return
-	
-	# Get current piece
-	var piece_type = player1_pieces[player1_current_piece_index]
-	
-	# Create block (player is always ID 1, at bottom)
+	# Place block
+	var piece_type = player_pieces[current_piece_index]
 	var block = BlockFactory.create_block(piece_type, grid_pos, 1)
+	
 	if block:
-		add_child(block)
-		blocks.append(block)
+		board_manager.add_block(block)
 		
 		game_state.register_block_placed(1)
-		player1_current_piece_index += 1
+		current_piece_index += 1
 		
-		# Update HUD
-		game_hud.update_blocks_remaining(1, player1_current_piece_index, 5)
+		game_hud.update_blocks_remaining(1, current_piece_index, 5)
 		
-		if player1_current_piece_index < player1_pieces.size():
-			print("Next piece: " + player1_pieces[player1_current_piece_index])
+		if current_piece_index < player_pieces.size():
+			print("Placed " + piece_type + "! Next: " + player_pieces[current_piece_index])
 		else:
-			print("All blocks placed! Waiting for opponent...")
+			print("All your blocks placed!")
 
 func _on_ai_place_block(piece_type: String, grid_pos: Vector2i) -> void:
 	"""AI places a block"""
@@ -248,84 +166,77 @@ func _on_ai_place_block(piece_type: String, grid_pos: Vector2i) -> void:
 	
 	var block = BlockFactory.create_block(piece_type, grid_pos, 2)
 	if block:
-		add_child(block)
-		blocks.append(block)
-		
+		board_manager.add_block(block)
 		game_state.register_block_placed(2)
-		
-		# Update HUD
 		game_hud.update_blocks_remaining(2, game_state.player2_blocks_placed, 5)
 
 func _on_phase_changed(new_phase: GameState.Phase) -> void:
-	"""Handle phase change"""
-	print("Phase changed to: " + game_state.get_phase_name())
+	"""Phase changed"""
 	game_hud.update_phase(game_state.get_phase_name())
 	
 	if new_phase == GameState.Phase.BATTLE:
-		_start_battle_phase()
+		_start_battle()
 
-func _start_battle_phase() -> void:
-	"""Start the battle phase with ball"""
+func _start_battle() -> void:
+	"""Start battle phase with ball"""
 	print("=== BATTLE PHASE ===")
 	
 	# Create ball
-	var board_width = Constants.BOARD_WIDTH * Constants.CELL_SIZE
-	var board_height = Constants.BOARD_HEIGHT * Constants.CELL_SIZE
+	var board_width = board_manager.board_width * board_manager.cell_size
+	var board_height = board_manager.board_height * board_manager.cell_size
 	
 	ball = Ball.new()
 	ball.initialize(
 		Vector2(board_width / 2, board_height / 2),
-		Vector2(0, -400)  # Start moving toward player 1
+		Vector2(0, 400)  # Start going DOWN toward player
 	)
-	ball.ball_missed.connect(_on_ball_missed)
-	add_child(ball)
+	board_manager.add_child(ball)
+	
+	# Initialize ball physics system
+	ball_physics = BallPhysics.new()
+	ball_physics.set_ball(ball)
+	ball_physics.set_board_manager(board_manager)
+	ball_physics.add_paddle(player_paddle)
+	ball_physics.add_paddle(ai_paddle)
+	ball_physics.ball_missed.connect(_on_ball_missed)
+	add_child(ball_physics)
 	
 	print("Ball spawned - FIGHT!")
 
-func _on_deployment_time_changed(time: float) -> void:
-	"""Update deployment timer in HUD"""
+func _process(delta: float) -> void:
+	"""Update game systems"""
+	if game_state and game_state.current_phase == GameState.Phase.BATTLE:
+		if ball_physics:
+			ball_physics.update_physics(delta)
+
+func _on_deployment_timer_update(time: float) -> void:
+	"""Update deployment timer"""
 	game_hud.update_timer(time)
 
 func _on_hp_changed(player_id: int, new_hp: int) -> void:
-	"""Update HP in HUD"""
+	"""HP changed"""
 	game_hud.update_player_hp(player_id, new_hp)
 
 func _on_score_changed(player_id: int, new_score: int) -> void:
-	"""Update score in HUD"""
+	"""Score changed"""
 	game_hud.update_player_score(player_id, new_score)
 
 func _on_ball_missed(player_id: int) -> void:
-	"""Ball was missed by a player"""
-	print("Player " + str(player_id) + " missed the ball!")
-	
-	# Apply damage
+	"""Ball missed by player"""
+	print("Player " + str(player_id) + " missed!")
 	game_state.damage_player(player_id, 10)
 
 func _on_match_ended(result: GameState.MatchResult) -> void:
 	"""Match ended"""
 	print("=== MATCH ENDED ===")
-	
 	match result:
 		GameState.MatchResult.PLAYER1_WIN:
-			print("PLAYER 1 WINS!")
+			print("YOU WIN!")
 		GameState.MatchResult.PLAYER2_WIN:
-			print("PLAYER 2 WINS!")
-		GameState.MatchResult.DRAW:
-			print("DRAW!")
-
-func _on_action_pressed(action: String, player_id: int) -> void:
-	"""Handle action input"""
-	# Only used in battle phase
-	pass
+			print("AI WINS!")
 
 func _on_paddle_moved(direction: float, player_id: int) -> void:
 	"""Handle paddle movement"""
 	if game_state.current_phase == GameState.Phase.BATTLE:
-		if player_id == 1 and player1_paddle:
-			player1_paddle.move_with_input(direction)
-		elif player_id == 2 and player2_paddle:
-			player2_paddle.move_with_input(direction)
-
-func stop() -> void:
-	"""Stop the game"""
-	print("Game stopped")
+		if player_id == 1 and player_paddle:
+			player_paddle.move_with_input(direction)
