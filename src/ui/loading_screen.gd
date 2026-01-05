@@ -87,12 +87,9 @@ func _start_loading() -> void:
 	
 	# Step 3: Initialize Steam
 	update_status("Connecting to Steam...", 50)
-	var steam_success = await _initialize_steam()
+	await _initialize_steam()
 	
-	if steam_success:
-		update_status("Steam connected!", 75)
-	else:
-		update_status("Steam offline (Mock mode)", 75)
+	update_status("Authentication complete!", 75)
 	
 	await get_tree().create_timer(0.3).timeout
 	
@@ -102,18 +99,19 @@ func _start_loading() -> void:
 	
 	emit_signal("loading_complete")
 
-func _initialize_steam() -> bool:
+func _initialize_steam() -> void:
 	"""Initialize Steam and wait for authentication"""
 	var steam_manager = SteamManager.new()
+	steam_manager.name = "SteamManager"
 	get_tree().root.add_child(steam_manager)
 	
-	var success = steam_manager.initialize()
+	steam_manager.initialize()
+	
+	# Wait for auth to complete
+	await steam_manager.auth_completed
 	
 	if steam_manager.is_authenticated():
 		update_status("Logged in as: " + steam_manager.get_player_name(), 70)
-		return true
-	
-	return success
 
 func update_status(text: String, percent: float) -> void:
 	"""Update loading status"""

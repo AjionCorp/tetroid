@@ -16,32 +16,32 @@ var is_steam_running: bool = false
 func _ready() -> void:
 	print("Steam Manager initializing...")
 
-func initialize() -> bool:
+func initialize() -> void:
 	"""Initialize Steam API"""
 	# Check if Steam module is available (requires GodotSteam plugin)
 	# For now, we'll simulate it for development
 	
 	if Engine.has_singleton("Steam"):
 		print("Steam API found, initializing...")
-		return _initialize_real_steam()
+		_initialize_real_steam()
 	else:
 		print("Steam API not found, using mock mode")
-		return _initialize_mock_steam()
+		_initialize_mock_steam()
 
-func _initialize_real_steam() -> bool:
+func _initialize_real_steam() -> void:
 	"""Initialize real Steam API (requires GodotSteam plugin)"""
 	var Steam = Engine.get_singleton("Steam")
 	
 	if not Steam.isSteamRunning():
 		push_error("Steam is not running!")
 		emit_signal("auth_failed", "Steam not running")
-		return false
+		return
 	
 	var init_result = Steam.steamInit()
 	if init_result.status != 1:
 		push_error("Failed to initialize Steam: " + str(init_result))
 		emit_signal("auth_failed", "Steam init failed")
-		return false
+		return
 	
 	is_steam_running = true
 	is_initialized = true
@@ -54,10 +54,8 @@ func _initialize_real_steam() -> bool:
 	
 	emit_signal("steam_initialized", true)
 	emit_signal("auth_completed", steam_id, steam_username)
-	
-	return true
 
-func _initialize_mock_steam() -> bool:
+func _initialize_mock_steam() -> void:
 	"""Mock Steam for development without Steam"""
 	is_steam_running = false
 	is_initialized = true
@@ -73,8 +71,6 @@ func _initialize_mock_steam() -> bool:
 	
 	emit_signal("steam_initialized", true)
 	emit_signal("auth_completed", steam_id, steam_username)
-	
-	return true
 
 func get_player_name() -> String:
 	"""Get current player name"""
