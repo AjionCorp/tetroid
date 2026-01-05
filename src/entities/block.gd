@@ -10,7 +10,7 @@ var block_id: int = 0
 var piece_type: String = ""
 var owner_id: int = 0
 var grid_position: Vector2i = Vector2i.ZERO
-var rotation: int = 0
+var piece_rotation: int = 0  # Renamed from 'rotation' to avoid Node2D conflict
 
 ## Stats
 var hp: int = 3
