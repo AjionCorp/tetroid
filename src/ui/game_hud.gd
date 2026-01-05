@@ -28,18 +28,22 @@ func _ready() -> void:
 
 func _create_hud() -> void:
 	"""Create HUD elements programmatically"""
-	# Top right - Player 1 stats
-	_create_player1_panel()
-	
-	# Bottom right - Player 2 stats
+	# Right top - Player 2 stats (AI/Opponent at top)
 	_create_player2_panel()
+	
+	# Right bottom - Player 1 stats (You at bottom)
+	_create_player1_panel()
 	
 	# Center top - Timer and phase
 	_create_center_display()
 
 func _create_player1_panel() -> void:
-	"""Create Player 1 stats panel (top right)"""
-	var panel = _create_stat_panel(Vector2(20, 20), "PLAYER 1", Color.CYAN)
+	"""Create Player 1 stats panel (bottom right)"""
+	var panel = _create_stat_panel(Vector2(-220, -200), "PLAYER 1 [YOU]", Color.CYAN)
+	panel.anchor_left = 1.0
+	panel.anchor_right = 1.0
+	panel.anchor_top = 1.0
+	panel.anchor_bottom = 1.0
 	
 	var vbox = panel.get_child(0) as VBoxContainer
 	
@@ -65,10 +69,10 @@ func _create_player1_panel() -> void:
 	add_child(panel)
 
 func _create_player2_panel() -> void:
-	"""Create Player 2 stats panel (bottom right)"""
-	var panel = _create_stat_panel(Vector2(20, -220), "PLAYER 2", Color.ORANGE)
-	panel.anchor_top = 1.0
-	panel.anchor_bottom = 1.0
+	"""Create Player 2 stats panel (top right)"""
+	var panel = _create_stat_panel(Vector2(-220, 20), "PLAYER 2 [AI]", Color.RED)
+	panel.anchor_left = 1.0
+	panel.anchor_right = 1.0
 	
 	var vbox = panel.get_child(0) as VBoxContainer
 	
@@ -152,10 +156,10 @@ func _create_center_display() -> void:
 	
 	# Instructions
 	var instructions = Label.new()
-	instructions.text = "Place your 5 blocks strategically!"
+	instructions.text = "Click anywhere to place blocks!\n(Except neutral line)"
 	instructions.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	instructions.add_theme_color_override("font_color", Constants.COLOR_TEXT_SECONDARY)
-	instructions.add_theme_font_size_override("font_size", 16)
+	instructions.add_theme_font_size_override("font_size", 14)
 	center.add_child(instructions)
 
 func update_timer(time: float) -> void:

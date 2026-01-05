@@ -116,29 +116,28 @@ func _create_board_grid() -> void:
 			line.width = 1
 			grid.add_child(line)
 	
-	# Highlight neutral zone
-	var neutral_zone = ColorRect.new()
-	neutral_zone.color = Color(Constants.COLOR_ACCENT, 0.3)
-	neutral_zone.position = Vector2(0, Constants.NEUTRAL_START_Y * Constants.CELL_SIZE)
-	neutral_zone.size = Vector2(
-		Constants.BOARD_WIDTH * Constants.CELL_SIZE,
-		2 * Constants.CELL_SIZE
-	)
-	grid.add_child(neutral_zone)
+	# Neutral zone - just a line
+	var neutral_line = Line2D.new()
+	var neutral_y = (Constants.BOARD_HEIGHT / 2) * Constants.CELL_SIZE
+	neutral_line.add_point(Vector2(0, neutral_y))
+	neutral_line.add_point(Vector2(Constants.BOARD_WIDTH * Constants.CELL_SIZE, neutral_y))
+	neutral_line.default_color = Constants.COLOR_ACCENT
+	neutral_line.width = 3
+	grid.add_child(neutral_line)
 
 func _create_players() -> void:
 	"""Create player paddles"""
-	# Player 1 paddle (top)
+	# Player 1 paddle (BOTTOM - human player)
 	player1_paddle = Paddle.new()
-	player1_paddle.initialize(1, 5 * Constants.CELL_SIZE)
+	player1_paddle.initialize(1, 57 * Constants.CELL_SIZE)
 	add_child(player1_paddle)
 	
-	# Player 2 paddle (bottom)
+	# Player 2 paddle (TOP - AI/opponent)
 	player2_paddle = Paddle.new()
-	player2_paddle.initialize(2, 57 * Constants.CELL_SIZE)
+	player2_paddle.initialize(2, 5 * Constants.CELL_SIZE)
 	add_child(player2_paddle)
 	
-	print("Players created")
+	print("Players created (P1=bottom, P2=top)")
 
 func _start_deployment_phase() -> void:
 	"""Start the deployment phase"""
@@ -162,7 +161,9 @@ func _start_deployment_phase() -> void:
 	deployment_ai.start_deployment(player2_pieces)
 	
 	# Show instructions
-	print("Place your 5 blocks! Use mouse to click where to place.")
+	print("=== YOU are at the BOTTOM, AI is at the TOP ===")
+	print("Click ANYWHERE on board to place your 5 blocks!")
+	print("(Cannot place on neutral line)")
 	print("Current piece: " + player1_pieces[0])
 
 func _generate_random_pieces(count: int) -> Array:
@@ -210,15 +211,20 @@ func _handle_deployment_click(click_pos: Vector2) -> void:
 	var grid_y = int(click_pos.y / Constants.CELL_SIZE)
 	var grid_pos = Vector2i(grid_x, grid_y)
 	
-	# Check if in player 1 territory
-	if not Constants.is_in_player1_territory(grid_y):
-		print("Can only place in your own territory during deployment!")
+	# Check if in neutral zone (can't place there)
+	if Constants.is_in_neutral_zone(grid_y):
+		print("Cannot place in neutral zone!")
+		return
+	
+	# Check bounds
+	if grid_x < 0 or grid_x >= Constants.BOARD_WIDTH or grid_y < 0 or grid_y >= Constants.BOARD_HEIGHT:
+		print("Out of bounds!")
 		return
 	
 	# Get current piece
 	var piece_type = player1_pieces[player1_current_piece_index]
 	
-	# Create block
+	# Create block (player is always ID 1, at bottom)
 	var block = BlockFactory.create_block(piece_type, grid_pos, 1)
 	if block:
 		add_child(block)

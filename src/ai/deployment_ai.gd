@@ -41,9 +41,9 @@ func _place_next_block() -> void:
 	var piece_type = blocks_to_place[current_block_index]
 	
 	# Simple AI: Place randomly in own territory
-	# Player 2 territory is bottom half (y: 32-61)
+	# AI is Player 2 at TOP (y: 0-29)
 	var x = randi() % (Constants.BOARD_WIDTH - 4) + 2  # Leave some margin
-	var y = randi() % 20 + 35  # In player 2 territory
+	var y = randi() % 25 + 2  # In top territory (avoid edges)
 	
 	var pos = Vector2i(x, y)
 	

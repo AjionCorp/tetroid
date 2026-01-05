@@ -40,11 +40,11 @@ func _create_visuals() -> void:
 	sprite.size = Vector2(paddle_width, 8)
 	sprite.position = Vector2(-paddle_width / 2, -4)  # Center it
 	
-	# Color based on player
+	# Color based on player (P1=bottom=cyan, P2=top=red)
 	if player_id == 1:
-		sprite.color = Color.CYAN
+		sprite.color = Color.CYAN  # Player at bottom
 	else:
-		sprite.color = Color.ORANGE
+		sprite.color = Color.RED  # AI at top
 	
 	add_child(sprite)
 

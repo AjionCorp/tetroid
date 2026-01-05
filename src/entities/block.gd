@@ -66,14 +66,14 @@ func _determine_territory() -> void:
 	if Constants.is_in_neutral_zone(grid_position.y):
 		territory = Territory.NEUTRAL
 	elif owner_id == 1:
-		# Player 1 owns top territory
-		if Constants.is_in_player1_territory(grid_position.y):
+		# Player 1 (human) owns BOTTOM territory
+		if Constants.is_in_player2_territory(grid_position.y):
 			territory = Territory.FRIENDLY
 		else:
 			territory = Territory.ENEMY
 	else:
-		# Player 2 owns bottom territory
-		if Constants.is_in_player2_territory(grid_position.y):
+		# Player 2 (AI) owns TOP territory
+		if Constants.is_in_player1_territory(grid_position.y):
 			territory = Territory.FRIENDLY
 		else:
 			territory = Territory.ENEMY
