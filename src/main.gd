@@ -7,7 +7,7 @@
 extends Node
 
 ## Game instance
-var game: Game
+var game
 
 func _ready() -> void:
 	print("=== Tetroid Starting ===")

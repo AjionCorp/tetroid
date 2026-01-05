@@ -12,10 +12,10 @@ var is_running: bool = false
 var game_time: float = 0.0
 
 ## Systems
-var input_system: InputSystem
+var input_system
 
 ## Entities
-var blocks: Array[Block] = []
+var blocks: Array = []
 
 ## Delta accumulator for fixed timestep
 var _delta_accumulator: float = 0.0

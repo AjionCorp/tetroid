@@ -68,7 +68,7 @@ static func _create_collision() -> Area2D:
 
 static func create_block_grid(piece_type: String, grid_positions: Array, owner_id: int) -> Array:
 	"""Create multiple blocks forming a Tetris piece"""
-	var blocks: Array[Block] = []
+	var blocks: Array = []
 	
 	for grid_pos in grid_positions:
 		var block := create_block(piece_type, grid_pos, owner_id)
@@ -90,7 +90,7 @@ static func calculate_piece_positions(piece_type: String, center_pos: Vector2i, 
 	if shape.is_empty():
 		return []
 	
-	var positions: Array[Vector2i] = []
+	var positions: Array = []
 	
 	# Parse shape array
 	for y in range(shape.size()):
@@ -111,7 +111,7 @@ static func calculate_piece_positions(piece_type: String, center_pos: Vector2i, 
 
 static func _rotate_positions(positions: Array, center: Vector2i, rotation: int) -> Array:
 	"""Rotate positions around center (90 degree increments)"""
-	var rotated: Array[Vector2i] = []
+	var rotated: Array = []
 	
 	for pos in positions:
 		var relative := pos - center
