@@ -174,7 +174,7 @@ func _create_test_blocks() -> void:
 	]
 	
 	for test in test_positions:
-		var block := BlockFactory.create_block(test.type, test.pos, 1)
+		var block = BlockFactory.create_block(test.type, test.pos, 1)
 		if block:
 			add_child(block)
 			blocks.append(block)
@@ -186,9 +186,9 @@ func _test_place_block() -> void:
 	"""Test placing a new block (Space key)"""
 	var random_x := randi() % Constants.BOARD_WIDTH
 	var random_y := randi() % 20 + 5  # Top half
-	var random_type := BlockData.get_all_piece_types()[randi() % 7]
+	var random_type = BlockData.get_all_piece_types()[randi() % 7]
 	
-	var block := BlockFactory.create_block(random_type, Vector2i(random_x, random_y), 1)
+	var block = BlockFactory.create_block(random_type, Vector2i(random_x, random_y), 1)
 	if block:
 		add_child(block)
 		blocks.append(block)

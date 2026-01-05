@@ -14,7 +14,7 @@ static func create_block(piece_type: String, grid_pos: Vector2i, owner_id: int):
 		return null
 	
 	# Create block instance
-	var block := Block.new()
+	var block = Block.new()
 	block.block_id = _next_block_id
 	_next_block_id += 1
 	
@@ -71,7 +71,7 @@ static func create_block_grid(piece_type: String, grid_positions: Array, owner_i
 	var blocks: Array = []
 	
 	for grid_pos in grid_positions:
-		var block := create_block(piece_type, grid_pos, owner_id)
+		var block = create_block(piece_type, grid_pos, owner_id)
 		if block:
 			blocks.append(block)
 	
