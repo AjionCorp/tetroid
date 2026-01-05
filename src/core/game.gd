@@ -11,6 +11,12 @@ var game_mode: Constants.GameMode = Constants.GameMode.ONE_VS_ONE
 var is_running: bool = false
 var game_time: float = 0.0
 
+## Systems
+var input_system: InputSystem
+
+## Entities
+var blocks: Array[Block] = []
+
 ## Delta accumulator for fixed timestep
 var _delta_accumulator: float = 0.0
 
@@ -21,14 +27,46 @@ func start() -> void:
 	"""Start the game"""
 	print("Starting game...")
 	
+	# Initialize input system
+	input_system = InputSystem.new()
+	add_child(input_system)
+	_connect_input_signals()
+	
 	# Create game world
 	_create_world()
+	
+	# Create test blocks
+	_create_test_blocks()
 	
 	# Initialize game state
 	is_running = true
 	game_time = 0.0
 	
 	print("Game started!")
+
+func _connect_input_signals() -> void:
+	"""Connect input system signals"""
+	input_system.action_pressed.connect(_on_action_pressed)
+	input_system.paddle_moved.connect(_on_paddle_moved)
+
+func _on_action_pressed(action: String, player_id: int) -> void:
+	"""Handle action input"""
+	print("Action pressed: " + action + " (Player " + str(player_id) + ")")
+	
+	match action:
+		"place":
+			_test_place_block()
+		"rotate_left":
+			print("Rotate left")
+		"rotate_right":
+			print("Rotate right")
+		"ability":
+			_test_activate_abilities()
+
+func _on_paddle_moved(direction: float, player_id: int) -> void:
+	"""Handle paddle movement"""
+	# Will be used for paddle control
+	pass
 
 func _create_world() -> void:
 	"""Create the game world programmatically"""
@@ -115,8 +153,56 @@ func _fixed_update(delta: float) -> void:
 	"""Fixed timestep update for game logic"""
 	game_time += delta
 	
-	# Update game systems here
-	# TODO: Add system updates when implemented
+	# Update all blocks
+	for block in blocks:
+		if is_instance_valid(block):
+			block._process(delta)
+
+func _create_test_blocks() -> void:
+	"""Create some test blocks to visualize the system"""
+	print("Creating test blocks...")
+	
+	# Create a few blocks of different types
+	var test_positions = [
+		{"type": "I_PIECE", "pos": Vector2i(5, 5)},
+		{"type": "O_PIECE", "pos": Vector2i(10, 8)},
+		{"type": "T_PIECE", "pos": Vector2i(15, 12)},
+		{"type": "S_PIECE", "pos": Vector2i(20, 15)},
+		{"type": "Z_PIECE", "pos": Vector2i(25, 20)},
+		{"type": "J_PIECE", "pos": Vector2i(30, 25)},
+		{"type": "L_PIECE", "pos": Vector2i(35, 28)},
+	]
+	
+	for test in test_positions:
+		var block := BlockFactory.create_block(test.type, test.pos, 1)
+		if block:
+			add_child(block)
+			blocks.append(block)
+			print("  Created " + test.type + " at " + str(test.pos))
+	
+	print("Test blocks created: " + str(blocks.size()))
+
+func _test_place_block() -> void:
+	"""Test placing a new block (Space key)"""
+	var random_x := randi() % Constants.BOARD_WIDTH
+	var random_y := randi() % 20 + 5  # Top half
+	var random_type := BlockData.get_all_piece_types()[randi() % 7]
+	
+	var block := BlockFactory.create_block(random_type, Vector2i(random_x, random_y), 1)
+	if block:
+		add_child(block)
+		blocks.append(block)
+		print("Placed " + random_type + " at (" + str(random_x) + ", " + str(random_y) + ")")
+
+func _test_activate_abilities() -> void:
+	"""Test activating abilities on all blocks (F key)"""
+	var activated := 0
+	for block in blocks:
+		if is_instance_valid(block) and block.activate_ability():
+			activated += 1
+	
+	if activated > 0:
+		print("Activated " + str(activated) + " abilities")
 
 func _update_fps_display() -> void:
 	"""Update FPS counter"""
