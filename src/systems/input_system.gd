@@ -54,10 +54,12 @@ func _process_player_input(player_id: int) -> void:
 	# Actions (digital - pressed this frame)
 	var action_names: Array = ["rotate_left", "rotate_right", "place", "ability"]
 	for action_name in action_names:
-		if Input.is_action_just_pressed(actions[action_name]):
-			action_pressed.emit(action_name, player_id)
-		elif Input.is_action_just_released(actions[action_name]):
-			action_released.emit(action_name, player_id)
+		var action_key: String = actions.get(action_name, "")
+		if not action_key.is_empty():
+			if Input.is_action_just_pressed(action_key):
+				action_pressed.emit(action_name, player_id)
+			elif Input.is_action_just_released(action_key):
+				action_released.emit(action_name, player_id)
 
 func get_move_input(player_id: int) -> float:
 	"""Get movement input (-1 = left, 1 = right, 0 = none)"""
@@ -68,9 +70,12 @@ func get_move_input(player_id: int) -> float:
 	var input: float = 0.0
 	
 	# Keyboard
-	if Input.is_action_pressed(actions["left"]):
+	var left_action: String = actions.get("left", "")
+	var right_action: String = actions.get("right", "")
+	
+	if not left_action.is_empty() and Input.is_action_pressed(left_action):
 		input -= 1.0
-	if Input.is_action_pressed(actions["right"]):
+	if not right_action.is_empty() and Input.is_action_pressed(right_action):
 		input += 1.0
 	
 	# Controller support (if connected)

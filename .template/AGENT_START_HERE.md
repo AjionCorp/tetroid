@@ -107,6 +107,7 @@ func create_block(type: String, pos: Vector2i) -> Block:
 
 ## 📖 Quick Links
 
+- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - 📋 Godot 4.x syntax cheat sheet
 - **[Godot 4.x Migration Table](docs/CODING_STANDARDS.md#common-migration-issues)** - Old vs New syntax
 - **[Game Design](docs/GAME_DESIGN.md)** - What we're building
 - **[Architecture](docs/ARCHITECTURE.md)** - System design

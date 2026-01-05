@@ -223,6 +223,9 @@ TBD - License to be determined
 
 **Remember**: This is a template-driven development project. Always check the `.template/` directory for the latest documentation and guidelines.
 
-**For AI Agents**: Read `.template/docs/AGENT_GUIDELINES.md` before starting any work!
+**For AI Agents**: 
+- 🚨 **START HERE**: [.template/AGENT_START_HERE.md](.template/AGENT_START_HERE.md)
+- 📖 **Quick Reference**: [.template/QUICK_REFERENCE.md](.template/QUICK_REFERENCE.md)
+- 📋 **Guidelines**: [.template/docs/AGENT_GUIDELINES.md](.template/docs/AGENT_GUIDELINES.md)
 
 **Last Updated**: 2026-01-05
