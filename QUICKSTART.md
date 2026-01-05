@@ -35,8 +35,17 @@ When you run the project, you should see:
 - **Background**: Dark game board (60×62 grid)
 - **Grid Lines**: Visual grid showing all cells
 - **Neutral Zone**: Highlighted 2-row zone in the middle
+- **Test Blocks**: 7 different colored blocks (one of each Tetris piece type)
 - **Text**: "TETROID - Code-Driven Development"
 - **FPS Counter**: Top-left showing 60 FPS
+
+## 🎮 Try It Out!
+
+**Space**: Place a random block at random position  
+**F Key**: Activate abilities on all blocks (watch them pulse!)  
+**A/D Keys**: Movement input (logged to console)  
+
+Watch the console for debug output!
 
 ## 🎯 What's Implemented
 
@@ -47,11 +56,27 @@ When you run the project, you should see:
 - **Configuration Loader** - JSON-based settings
 - **Block Data System** - 7 Tetris pieces defined
 - **Asset Registry** - Hybrid procedural/external assets
+- **Input System** - Keyboard + controller support
+- **Block Entities** - HP, abilities, territory system
+- **Block Factory** - Programmatic entity creation
 
 ### Procedural Generation ✅
 - **Sprite Generator** - Creates block textures on the fly
 - **Audio Generator** - Synthesizes sound effects
 - **Grid Rendering** - Programmatic visual board
+
+### Gameplay (Week 2-3) ✅
+- **Block System** - Full entity with HP, damage, healing
+- **Territory System** - Friendly/enemy/neutral zones
+- **Ability System** - Cooldowns and activation
+- **Visual Feedback** - Damage flash, ability effects, destruction
+- **Particle Effects** - Destruction particles
+- **Interactive Tests** - Place blocks and activate abilities
+
+### Phase 1 Progress
+- ✅ **Week 1**: Setup & Architecture (100%)
+- ✅ **Week 2**: Core Engine Systems (100%)
+- 🔄 **Week 3**: Basic Gameplay Prototype (40% - blocks done, need ball & paddle)
 
 ### Project Structure ✅
 ```
