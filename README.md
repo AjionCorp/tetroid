@@ -1,0 +1,217 @@
+# Tetroid
+
+> A competitive multiplayer game combining Tetris, Arkanoid, and Mechabellum mechanics.
+
+![Tetroid Banner](docs/assets/tetroid_banner.png)
+*Banner image placeholder*
+
+## 🎮 About
+
+**Tetroid** is an innovative competitive game where players strategically place Tetris pieces with unique abilities while managing ball physics in a split-screen arena. Master the balance between defensive positioning and offensive strikes in intense 1v1, 2v2, or 4-player free-for-all matches.
+
+### Key Features
+- ⚡ **Strategic Block Placement**: Each Tetris piece has unique abilities
+- 🎯 **Skill-Based Gameplay**: Precise paddle control and ball physics
+- 🌐 **Multiplayer Modes**: 1v1, 2v2, and 4-player FFA
+- 🤖 **AI Opponents**: 4 difficulty levels with smart behavior
+- 🏆 **Competitive Systems**: Ranked matchmaking, leaderboards, tournaments
+- 🎨 **Retro Style**: Pixel art with modern polish
+- 💾 **Steam Integration**: Achievements, cloud saves, and more
+
+## 📋 Project Status
+
+**Development Stage**: Template Creation (Week 1)  
+**Progress**: ~5% (Foundation)  
+**Target Launch**: TBD (17+ weeks estimated)
+
+This is a multi-agent AI development project using structured collaboration.
+
+## 🚀 Quick Start
+
+### For Developers
+
+1. **Read the Documentation**
+   ```bash
+   Start here: .template/README.md
+   Architecture: .template/docs/ARCHITECTURE.md
+   Game Design: .template/docs/GAME_DESIGN.md
+   ```
+
+2. **Check Current State**
+   ```bash
+   See: .template/docs/CURRENT_STATE.md
+   ```
+
+3. **Follow Guidelines**
+   ```bash
+   Agent Guidelines: .template/docs/AGENT_GUIDELINES.md
+   Coding Standards: .template/docs/CODING_STANDARDS.md
+   ```
+
+### For AI Agents
+
+Before starting work:
+1. ✅ Read `.template/docs/AGENT_GUIDELINES.md`
+2. ✅ Check `.template/docs/CURRENT_STATE.md`
+3. ✅ Review your role's responsibilities
+4. ✅ Claim tasks and update documentation
+5. ✅ Follow coding standards
+6. ✅ Write tests for your code
+
+## 📁 Project Structure
+
+```
+Tetroid/
+├── .template/              # Complete documentation & guidelines (READ FIRST!)
+│   ├── README.md          # Template overview
+│   ├── docs/              # All technical documentation
+│   └── plans/             # Development roadmaps
+│
+├── src/                   # Source code (to be created)
+├── tests/                 # Test suites (to be created)
+├── assets/                # Game assets (to be created)
+├── tools/                 # Development tools (to be created)
+└── README.md             # This file
+```
+
+## 🎯 Core Mechanics
+
+### Game Board
+- **Size**: 60 blocks wide × 62 blocks tall
+- **Layout**: Two 30-block territories + 2-block neutral zone
+- **Victory**: Reduce opponent's HP to 0
+
+### Tetris Pieces with Abilities
+- **I-Piece**: Laser Line
+- **O-Piece**: Shield Bubble
+- **T-Piece**: Triple Shot
+- **S-Piece**: Healing Wave
+- **Z-Piece**: Speed Boost
+- **J-Piece**: Bouncer
+- **L-Piece**: Spawn Blocker
+
+### Territory System
+- **Friendly Territory**: Defensive abilities stronger
+- **Enemy Territory**: Offensive abilities stronger
+- **Neutral Zone**: No placement allowed
+
+### Ball Physics
+- Bounces between player territories
+- Hits activate block abilities
+- Paddle deflects ball back
+- Missed balls reduce HP
+
+## 🛠️ Technology Stack
+
+### Engine (TBD)
+- **Primary Option**: Godot 4.2+ (GDScript/C#)
+- **Alternative**: Unity 2023+ with DOTS/ECS
+
+### Backend
+- **Language**: Rust or Go
+- **Database**: PostgreSQL
+- **Cache**: Redis
+- **Message Queue**: RabbitMQ
+
+### Platform
+- **Steam** (Windows, Linux, Mac planned)
+
+## 📚 Documentation
+
+### Essential Docs
+- [**Getting Started**](.template/docs/GETTING_STARTED.md) - Start here!
+- [**Code-Driven Development**](.template/docs/CODE_DRIVEN_DEVELOPMENT.md) - ⭐ Our approach
+- [**Architecture**](.template/docs/ARCHITECTURE.md) - System design
+- [**Game Design**](.template/docs/GAME_DESIGN.md) - Complete mechanics
+- [**Agent Guidelines**](.template/docs/AGENT_GUIDELINES.md) - Collaboration rules
+- [**Coding Standards**](.template/docs/CODING_STANDARDS.md) - Code style
+- [**Current State**](.template/docs/CURRENT_STATE.md) - Project status
+
+### Technical Docs
+- [**Networking**](.template/docs/NETWORKING.md) - Multiplayer implementation
+- [**AI System**](.template/docs/AI_SYSTEM.md) - AI opponents
+- [**Steam Integration**](.template/docs/STEAM_INTEGRATION.md) - Platform features
+
+### Asset Guides
+- [**Art Guide**](.template/docs/ART_GUIDE.md) - Visual design
+- [**Audio Guide**](.template/docs/AUDIO_GUIDE.md) - Sound design
+
+### Planning
+- [**Development Roadmap**](.template/plans/DEVELOPMENT_ROADMAP.md) - Timeline
+- [**FAQ**](.template/docs/FAQ.md) - Common questions
+
+## 🤝 Multi-Agent Development
+
+This project uses a structured multi-agent approach:
+
+### Agent Roles
+1. **System Architect** - Architecture, performance
+2. **Gameplay Programmer** - Mechanics, balance
+3. **Network Engineer** - Multiplayer, netcode
+4. **AI Developer** - Bot opponents
+5. **UI/UX Developer** - Interface, menus
+6. **Graphics Programmer** - Rendering, VFX
+7. **Audio Engineer** - Sound, music
+8. **Integration Specialist** - Steam, platforms
+9. **QA & Testing** - Testing, quality
+10. **DevOps** - Build, deployment
+
+### Workflow
+1. Check `CURRENT_STATE.md` for active tasks
+2. Claim a task by updating documentation
+3. Implement following standards
+4. Write tests
+5. Update documentation
+6. Mark complete
+
+## 🎯 Development Phases
+
+1. **Phase 1: Foundation** (Weeks 1-3) - Core engine ✅ In Progress
+2. **Phase 2: Core Mechanics** (Weeks 4-6) - Gameplay systems
+3. **Phase 3: Multiplayer** (Weeks 7-10) - Online play
+4. **Phase 4: AI & Content** (Weeks 11-13) - Bots and content
+5. **Phase 5: Steam & Testing** (Weeks 14-16) - Integration and QA
+6. **Phase 6: Launch** (Week 17+) - Release and support
+
+## 📊 Current Progress
+
+| System | Progress | Status |
+|--------|----------|--------|
+| Documentation | 95% | ✅ Complete |
+| Core Engine | 0% | 🔴 Not Started |
+| Gameplay | 0% | 🔴 Not Started |
+| Networking | 0% | 🔴 Not Started |
+| AI | 0% | 🔴 Not Started |
+| UI | 0% | 🔴 Not Started |
+| Graphics | 0% | 🔴 Not Started |
+| Audio | 0% | 🔴 Not Started |
+| Steam Integration | 0% | 🔴 Not Started |
+
+## 🐛 Known Issues
+
+See [CURRENT_STATE.md](.template/docs/CURRENT_STATE.md) for current issues and blockers.
+
+## 📝 License
+
+TBD - License to be determined
+
+## 🙏 Acknowledgments
+
+- Game concept inspired by Tetris, Arkanoid, and Mechabellum
+- Developed using multi-agent AI collaboration
+- Built with [Engine TBD]
+
+## 📞 Contact
+
+- **Discord**: TBD
+- **Twitter**: TBD
+- **Steam**: TBD
+- **Email**: TBD
+
+---
+
+**Remember**: This is a template-driven development project. Always check the `.template/` directory for the latest documentation and guidelines.
+
+**For AI Agents**: Read `.template/docs/AGENT_GUIDELINES.md` before starting any work!
+
+**Last Updated**: 2026-01-05

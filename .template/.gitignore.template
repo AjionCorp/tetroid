@@ -1,0 +1,79 @@
+# Godot 4.x Project .gitignore
+
+# Godot-specific ignores
+.import/
+export.cfg
+export_presets.cfg
+.mono/
+data_*/
+mono_crash.*.json
+
+# Imported translations (automatically generated from CSV)
+*.translation
+
+# Godot Editor
+.godot/
+
+# Build artifacts
+builds/
+*.exe
+*.pck
+*.zip
+*.dmg
+*.app
+
+# OS-specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+temp/
+tmp/
+
+# Generated documentation
+docs/generated/
+
+# Tests
+.coverage
+coverage/
+*.test
+
+# External assets - OPTIONAL
+# Uncomment if you want to exclude large external assets from git
+# and use git-lfs or external hosting instead
+#
+# assets/audio/music/*.ogg
+# assets/sprites/high_res/*.png
+# assets/videos/*.mp4
+
+# However, keep small assets and placeholders in git
+# This allows procedural fallback to work
+
+# Keep these directories
+!assets/
+!assets/sprites/
+!assets/audio/
+!assets/fonts/
+
+# Keep .gitkeep files
+!.gitkeep

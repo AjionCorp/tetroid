@@ -1,0 +1,159 @@
+# Tetroid - Git Ignore File
+
+# Godot 4.x specific
+.import/
+export.cfg
+export_presets.cfg
+.mono/
+data_*/
+mono_crash.*.json
+
+# Godot Editor
+.godot/
+
+# Imported translations (automatically generated from CSV)
+*.translation
+
+# Build artifacts
+builds/
+dist/
+*.exe
+*.pck
+*.zip
+*.dmg
+*.app
+*.apk
+*.aab
+
+# Compiled files
+*.o
+*.so
+*.dll
+*.dylib
+*.a
+
+# OS-specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+desktop.ini
+
+# IDE and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*~
+.project
+.classpath
+.settings/
+*.sublime-workspace
+*.code-workspace
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+logs/
+*.log.*
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+temp/
+tmp/
+*.cache
+
+# Python (if using Python for tools)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+
+# Node.js (if using Node for tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Rust (if using Rust for backend)
+target/
+Cargo.lock
+**/*.rs.bk
+
+# Go (if using Go for backend)
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+
+# Test coverage
+.coverage
+coverage/
+*.test
+htmlcov/
+
+# Generated documentation
+docs/generated/
+docs/build/
+_build/
+
+# Secrets and config (NEVER commit these!)
+*.env
+.env.*
+secrets.json
+config.local.json
+steam_api_key.txt
+*.pem
+*.key
+*.cert
+
+# Large assets (consider using Git LFS)
+# Uncomment if assets are very large
+# assets/audio/music/*.ogg
+# assets/videos/*.mp4
+# assets/textures/4k/*.png
+
+# Keep empty directories
+!**/.gitkeep
+
+# Development
+*.orig
+.vscode/settings.json
+.vscode/launch.json
+
+# Profiling
+*.prof
+*.perf
+*.profdata
+
+# Backups
+*-backup
+*-old
+*.orig
+
+# System files
+Icon?
+.svn/
+.hg/
+.bzr/
+
+# CI/CD artifacts
+.github/.env
