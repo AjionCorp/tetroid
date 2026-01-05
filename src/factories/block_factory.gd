@@ -6,7 +6,7 @@ class_name BlockFactory
 
 static var _next_block_id: int = 1
 
-static func create_block(piece_type: String, grid_pos: Vector2i, owner_id: int) -> Block:
+static func create_block(piece_type: String, grid_pos: Vector2i, owner_id: int):
 	"""Create a block entity"""
 	var config := BlockData.get_config(piece_type)
 	if config.is_empty():
@@ -32,7 +32,7 @@ static func create_block(piece_type: String, grid_pos: Vector2i, owner_id: int) 
 	
 	return block
 
-static func create_test_block(grid_pos: Vector2i) -> Block:
+static func create_test_block(grid_pos: Vector2i):
 	"""Create a test block for development"""
 	return create_block("I_PIECE", grid_pos, 1)
 
