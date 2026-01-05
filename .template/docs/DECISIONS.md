@@ -198,7 +198,7 @@ Need to decide between visual editor-based development vs code-driven developmen
 Need to choose game engine that supports code-driven development for AI agents.
 
 #### Options Considered
-1. **Godot 4.2+ (GDScript)**
+1. **Godot 4.5 (GDScript)**
    - Pros: 
      - **Code-first friendly**: Can create entire game in GDScript
      - Lightweight, fast iteration
@@ -242,7 +242,7 @@ Need to choose game engine that supports code-driven development for AI agents.
      - Reinventing networking, physics, etc.
 
 #### Decision
-**Godot 4.2+ with GDScript** for:
+**Godot 4.5 with GDScript** for:
 - **Code-first development**: Create entire game programmatically
 - Scene files are text-based (`.tscn`) - git-friendly
 - Can avoid editor for most tasks
@@ -289,7 +289,7 @@ func create_world() -> Node2D:
 ```
 
 #### Next Steps
-- Install Godot 4.2+
+- Install Godot 4.5
 - Set up project structure (all code)
 - Create base classes
 - Implement code-driven asset loading

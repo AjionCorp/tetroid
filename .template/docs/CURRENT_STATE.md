@@ -231,7 +231,7 @@
 
 1. **Template Phase**: Currently creating the template structure. Real development hasn't begun.
 
-2. **Engine Selection Pending**: Need to decide between Godot 4.2+ and Unity 2023+. See `/plans/ENGINE_SELECTION.md` for analysis.
+2. **Engine Selection Pending**: Need to decide between Godot 4.5 and Unity 2023+. See `/plans/ENGINE_SELECTION.md` for analysis.
 
 3. **Steam Integration**: Will need Steam SDK and developer account. Don't start until we have credentials.
 
@@ -242,7 +242,7 @@
 ### Decisions Made
 
 1. ✅ **Development Philosophy**: 100% Code-Driven (2026-01-05)
-2. ✅ **Engine Choice**: Godot 4.2+ with GDScript (2026-01-05)
+2. ✅ **Engine Choice**: Godot 4.5 with GDScript (2026-01-05)
 3. ✅ **Art Approach**: Procedural generation + data-driven (2026-01-05)
 
 ### Decisions Needed

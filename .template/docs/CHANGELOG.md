@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Changed
 - **Development Philosophy**: Code-driven with asset flexibility
-- **Engine Choice**: Godot 4.2+ selected for code-first support
+- **Engine Choice**: Godot 4.5 selected for code-first support
 - **Asset Strategy**: Procedural generation PRIMARY, external assets OPTIONAL
 - All documentation updated to reflect hybrid approach
 

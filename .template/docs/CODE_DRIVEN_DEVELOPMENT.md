@@ -1006,7 +1006,7 @@ static func create_button(style: String) -> TextureButton:
 
 ## 🚀 Getting Started Checklist
 
-- [ ] Install Godot 4.2+
+- [ ] Install Godot 4.5
 - [ ] Create project with minimal main.tscn
 - [ ] Set up src/ directory structure
 - [ ] Set up assets/ directory structure (optional initially)
