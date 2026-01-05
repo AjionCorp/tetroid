@@ -1,0 +1,45 @@
+{
+  "game": {
+    "board_width": 60,
+    "board_height": 62,
+    "cell_size": 16,
+    "target_fps": 60
+  },
+  "gameplay": {
+    "starting_hp": 100,
+    "starting_blocks": 5,
+    "ball_speed": 400,
+    "ball_speed_min": 150,
+    "ball_speed_max": 1000,
+    "paddle_speed": 400
+  },
+  "network": {
+    "tick_rate": 30,
+    "max_players": 4,
+    "default_port": 7777
+  },
+  "ai": {
+    "difficulties": {
+      "easy": {
+        "reaction_time": 0.3,
+        "error_rate": 0.3,
+        "prediction_accuracy": 0.5
+      },
+      "normal": {
+        "reaction_time": 0.15,
+        "error_rate": 0.15,
+        "prediction_accuracy": 0.7
+      },
+      "hard": {
+        "reaction_time": 0.08,
+        "error_rate": 0.05,
+        "prediction_accuracy": 0.9
+      },
+      "expert": {
+        "reaction_time": 0.03,
+        "error_rate": 0.01,
+        "prediction_accuracy": 0.98
+      }
+    }
+  }
+}

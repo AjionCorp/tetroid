@@ -1,0 +1,65 @@
+{
+  "I_PIECE": {
+    "name": "I-Piece",
+    "hp": 3,
+    "color": "#00FFFF",
+    "shape": [[1, 1, 1, 1]],
+    "ability": "laser_line",
+    "ability_cooldown": 5.0,
+    "description": "Fires a laser across the row when hit"
+  },
+  "O_PIECE": {
+    "name": "O-Piece",
+    "hp": 4,
+    "color": "#FFFF00",
+    "shape": [[1, 1], [1, 1]],
+    "ability": "shield_bubble",
+    "ability_cooldown": 8.0,
+    "description": "Creates protective barrier that absorbs hits"
+  },
+  "T_PIECE": {
+    "name": "T-Piece",
+    "hp": 3,
+    "color": "#AA00FF",
+    "shape": [[0, 1, 0], [1, 1, 1]],
+    "ability": "triple_shot",
+    "ability_cooldown": 6.0,
+    "description": "Splits ball into 3 projectiles"
+  },
+  "S_PIECE": {
+    "name": "S-Piece",
+    "hp": 3,
+    "color": "#00FF00",
+    "shape": [[0, 1, 1], [1, 1, 0]],
+    "ability": "healing_wave",
+    "ability_cooldown": 10.0,
+    "description": "Heals nearby blocks when hit"
+  },
+  "Z_PIECE": {
+    "name": "Z-Piece",
+    "hp": 3,
+    "color": "#FF0000",
+    "shape": [[1, 1, 0], [0, 1, 1]],
+    "ability": "speed_boost",
+    "ability_cooldown": 4.0,
+    "description": "Increases ball speed dramatically"
+  },
+  "J_PIECE": {
+    "name": "J-Piece",
+    "hp": 3,
+    "color": "#0000FF",
+    "shape": [[1, 0, 0], [1, 1, 1]],
+    "ability": "bouncer",
+    "ability_cooldown": 5.0,
+    "description": "Reflects ball at sharp angles"
+  },
+  "L_PIECE": {
+    "name": "L-Piece",
+    "hp": 3,
+    "color": "#FF8800",
+    "shape": [[0, 0, 1], [1, 1, 1]],
+    "ability": "spawn_blocker",
+    "ability_cooldown": 7.0,
+    "description": "Creates temporary obstacle block"
+  }
+}
