@@ -114,8 +114,8 @@ static func _rotate_positions(positions: Array, center: Vector2i, rotation: int)
 	var rotated: Array = []
 	
 	for pos in positions:
-		var relative := pos - center
-		var new_relative := relative
+		var relative: Vector2i = pos - center
+		var new_relative: Vector2i = relative
 		
 		# Apply rotation (0, 90, 180, 270)
 		match rotation % 4:

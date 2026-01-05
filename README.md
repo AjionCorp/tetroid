@@ -28,6 +28,15 @@ This is a multi-agent AI development project using structured collaboration.
 
 ## 🚀 Quick Start
 
+### For AI Agents
+
+**🚨 START HERE: [.template/AGENT_START_HERE.md](.template/AGENT_START_HERE.md)**
+
+Critical requirements before coding:
+- Godot 4.5+ syntax ONLY
+- Read coding standards first
+- No Godot 3.x patterns
+
 ### For Developers
 
 1. **Read the Documentation**
@@ -52,11 +61,13 @@ This is a multi-agent AI development project using structured collaboration.
 
 Before starting work:
 1. ✅ Read `.template/docs/AGENT_GUIDELINES.md`
-2. ✅ Check `.template/docs/CURRENT_STATE.md`
-3. ✅ Review your role's responsibilities
-4. ✅ Claim tasks and update documentation
-5. ✅ Follow coding standards
+2. ✅ **Read `.template/docs/CODING_STANDARDS.md`** ⚠️ **CRITICAL: Godot 4.x syntax**
+3. ✅ Check `.template/docs/CURRENT_STATE.md`
+4. ✅ Review your role's responsibilities
+5. ✅ Claim tasks and update documentation
 6. ✅ Write tests for your code
+
+**🚨 CRITICAL: This project uses Godot 4.5+ ONLY. Do NOT use Godot 3.x syntax!**
 
 ## 📁 Project Structure
 

@@ -687,6 +687,231 @@ class Example:
         pass
 ```
 
+## 🎮 Godot 4.x Best Practices
+
+### ⚠️ CRITICAL: Use Godot 4.x Syntax ONLY
+
+**This project targets Godot 4.5+. DO NOT use deprecated Godot 3.x syntax.**
+
+### Signal Emission (CRITICAL)
+
+**Godot 4.x**: Use `.emit()` method
+**Godot 3.x**: Used `emit_signal()` function (DEPRECATED)
+
+```gdscript
+# ✓ CORRECT (Godot 4.x):
+signal player_hit(damage: int)
+signal game_over()
+
+func take_damage(amount: int) -> void:
+    hp -= amount
+    player_hit.emit(amount)  # Use .emit()
+    
+    if hp <= 0:
+        game_over.emit()  # Use .emit()
+
+# ✗ WRONG (Godot 3.x - DO NOT USE):
+func take_damage(amount: int) -> void:
+    hp -= amount
+    emit_signal("player_hit", amount)  # DEPRECATED
+    
+    if hp <= 0:
+        emit_signal("game_over")  # DEPRECATED
+```
+
+### Type Hints
+
+**Always use type hints** in Godot 4.x for better performance and error detection:
+
+```gdscript
+# ✓ Good: Full type hints
+func create_block(piece_type: String, pos: Vector2i, owner: int) -> Block:
+    var config: Dictionary = BlockData.get_config(piece_type)
+    var block: Block = Block.new()
+    return block
+
+# ✗ Bad: No type hints
+func create_block(piece_type, pos, owner):
+    var config = BlockData.get_config(piece_type)
+    var block = Block.new()
+    return block
+```
+
+### File System Access
+
+**Godot 4.x**: Use `FileAccess` class
+**Godot 3.x**: Used `File` class (REMOVED)
+
+```gdscript
+# ✓ CORRECT (Godot 4.x):
+func load_data(path: String) -> String:
+    if not FileAccess.file_exists(path):
+        return ""
+    
+    var file := FileAccess.open(path, FileAccess.READ)
+    if file:
+        var content := file.get_as_text()
+        return content
+    return ""
+
+# ✗ WRONG (Godot 3.x - DO NOT USE):
+func load_data(path: String) -> String:
+    var file = File.new()  # File class no longer exists
+    if file.file_exists(path):
+        file.open(path, File.READ)
+        return file.get_as_text()
+```
+
+### Audio Streams
+
+**Use correct formats for AudioStreamWAV**:
+
+```gdscript
+# ✓ Good: 16-bit audio (standard)
+var stream := AudioStreamWAV.new()
+stream.format = AudioStreamWAV.FORMAT_16_BITS
+stream.mix_rate = 44100
+stream.stereo = false
+# Properly encode 16-bit samples (-32768 to 32767)
+
+# ⚠ Avoid: 8-bit audio (prone to issues)
+# Only use 8-bit if you understand unsigned byte conversion (0-255)
+```
+
+### Node References
+
+**Cache node references** instead of repeated lookups:
+
+```gdscript
+# ✓ Good: Cache reference
+var _fps_label: Label = null
+
+func _ready() -> void:
+    _fps_label = Label.new()
+    add_child(_fps_label)
+
+func _process(delta: float) -> void:
+    if _fps_label:
+        _fps_label.text = "FPS: " + str(Engine.get_frames_per_second())
+
+# ✗ Bad: Lookup every frame
+func _process(delta: float) -> void:
+    var fps_label := get_node_or_null("FPSLabel")  # Expensive!
+    if fps_label:
+        fps_label.text = "FPS: " + str(Engine.get_frames_per_second())
+```
+
+### Null Checking
+
+**Use `is_instance_valid()` for objects**:
+
+```gdscript
+# ✓ Good: Proper validation
+func update_blocks(delta: float) -> void:
+    for block in blocks:
+        if is_instance_valid(block):
+            block.update(delta)
+
+# ✗ Bad: Only checks null
+func update_blocks(delta: float) -> void:
+    for block in blocks:
+        if block != null:  # Doesn't catch freed instances
+            block.update(delta)
+```
+
+### Fixed Timestep Physics
+
+**Implement with overflow protection**:
+
+```gdscript
+# ✓ Good: Protected fixed timestep
+const FIXED_DELTA: float = 1.0 / 60.0
+const MAX_PHYSICS_STEPS: int = 5
+
+var _delta_accumulator: float = 0.0
+
+func _process(delta: float) -> void:
+    _delta_accumulator += delta
+    
+    var steps := 0
+    while _delta_accumulator >= FIXED_DELTA and steps < MAX_PHYSICS_STEPS:
+        _fixed_update(FIXED_DELTA)
+        _delta_accumulator -= FIXED_DELTA
+        steps += 1
+    
+    # Prevent spiral of death
+    if steps >= MAX_PHYSICS_STEPS:
+        _delta_accumulator = 0.0
+
+# ✗ Bad: No step limit (can freeze game)
+func _process(delta: float) -> void:
+    _delta_accumulator += delta
+    
+    while _delta_accumulator >= FIXED_DELTA:
+        _fixed_update(FIXED_DELTA)  # Could loop forever!
+        _delta_accumulator -= FIXED_DELTA
+```
+
+### Common Gotchas
+
+**1. String Formatting**
+```gdscript
+# Godot 4.x supports both:
+var text = "Player %d has %d HP" % [player_id, hp]  # Old style (works)
+var text = "Player {0} has {1} HP".format([player_id, hp])  # Format (better)
+```
+
+**2. Input Events**
+```gdscript
+# Always check input action existence:
+if InputMap.has_action("player_jump"):
+    if Input.is_action_pressed("player_jump"):
+        jump()
+```
+
+**3. Await instead of Yield**
+```gdscript
+# ✓ Godot 4.x:
+await get_tree().create_timer(1.0).timeout
+await some_signal
+
+# ✗ Godot 3.x (DO NOT USE):
+yield(get_tree().create_timer(1.0), "timeout")
+yield(self, "some_signal")
+```
+
+### Version Check Template
+
+**When uncertain about compatibility**:
+
+```gdscript
+# Add version check if using new features
+if Engine.get_version_info().major >= 4:
+    # Godot 4.x specific code
+    pass
+else:
+    # Fallback (should not happen in this project)
+    push_error("This project requires Godot 4.5+")
+```
+
+### Documentation References
+
+**Always check official Godot 4.x documentation**:
+- https://docs.godotengine.org/en/stable/
+- Look for "What's new in Godot 4" sections
+- Check migration guides when in doubt
+
+### Common Migration Issues
+
+| Godot 3.x (DON'T USE) | Godot 4.x (USE THIS) |
+|----------------------|---------------------|
+| `emit_signal("name", args)` | `signal_name.emit(args)` |
+| `File.new()` | `FileAccess` |
+| `yield(...)` | `await ...` |
+| `get_tree().create_timer().connect()` | `await get_tree().create_timer().timeout` |
+| `OS.get_ticks_msec()` | `Time.get_ticks_msec()` |
+| `get_viewport().size` | `get_viewport().get_visible_rect().size` |
+
 ## 🔄 Version Control
 
 ### Commit Messages

@@ -1,5 +1,7 @@
 # Tetroid - Multi-Agent Game Development Template
 
+> **🚨 AI AGENTS: READ THIS FIRST → [AGENT_START_HERE.md](AGENT_START_HERE.md)**
+
 ## 🎮 Game Overview
 
 **Tetroid** is a competitive multiplayer game combining elements of Tetris, Arkanoid, and Mechabellum. Players strategically place Tetris blocks with unique abilities while managing ball physics in a split-screen arena.

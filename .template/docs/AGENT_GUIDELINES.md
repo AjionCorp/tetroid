@@ -240,15 +240,19 @@ This file contains:
 
 **Follow these rules**:
 1. Stick to your role's responsibilities
-2. Use coding standards from `/docs/CODING_STANDARDS.md`
-3. Write tests for new functionality
-4. Update relevant documentation
-5. Add comments for complex logic
+2. **Use coding standards from `.template/docs/CODING_STANDARDS.md`** ⚠️
+3. **Use ONLY Godot 4.x syntax** (`.emit()` not `emit_signal()`)
+4. Write tests for new functionality
+5. Update relevant documentation
+6. Add comments for complex logic
+7. Add type hints to all functions and variables
 
 ### Step 4: Self-Review
 
 **Before considering work complete**:
-- [ ] Code follows coding standards
+- [ ] **Code uses Godot 4.x syntax** (no `emit_signal()`, `yield`, `File.new()`, etc.)
+- [ ] **Code follows coding standards** (`.template/docs/CODING_STANDARDS.md`)
+- [ ] **Type hints on all functions/variables**
 - [ ] Tests written and passing
 - [ ] No new linter errors
 - [ ] Documentation updated
@@ -339,6 +343,20 @@ Use `/docs/DECISIONS.md`:
 ## 🔄 Dependency Management
 
 ### Before Starting Work
+
+**MANDATORY: Read These First** ⚠️
+
+1. **[CODING_STANDARDS.md](.template/docs/CODING_STANDARDS.md)** - Especially [Godot 4.x Best Practices](CODING_STANDARDS.md#-godot-4x-best-practices)
+2. **[CURRENT_STATE.md](.template/docs/CURRENT_STATE.md)** - Current project status
+3. **[CODE_DRIVEN_DEVELOPMENT.md](.template/docs/CODE_DRIVEN_DEVELOPMENT.md)** - Development approach
+
+**CRITICAL RULES** 🚨
+
+- ✅ **USE Godot 4.5+ syntax ONLY** (signals use `.emit()`, not `emit_signal()`)
+- ✅ **READ coding standards** before writing any code
+- ✅ **NEVER use Godot 3.x patterns** (see migration table in CODING_STANDARDS.md)
+- ✅ **ALWAYS add type hints** to functions and variables
+- ✅ **FOLLOW the established patterns** in existing code
 
 **Check dependencies**:
 ```python
@@ -717,34 +735,37 @@ Before any release:
 
 ### Don'ts ❌
 
-- Don't break working code
-- Don't commit broken code
-- Don't skip tests
-- Don't ignore warnings
-- Don't hardcode values
-- Don't leave TODO comments unfixed
-- Don't optimize prematurely
-- Don't duplicate code
-- Don't ignore dependencies
-- Don't work in isolation
+- ❌ **Don't use Godot 3.x syntax** (emit_signal, yield, File.new, etc.)
+- ❌ Don't break working code
+- ❌ Don't commit broken code
+- ❌ Don't skip tests
+- ❌ Don't ignore warnings
+- ❌ Don't hardcode values
+- ❌ Don't leave TODO comments unfixed
+- ❌ Don't optimize prematurely
+- ❌ Don't duplicate code
+- ❌ Don't ignore dependencies
+- ❌ Don't work in isolation
 
 ## 🎓 Learning Resources
 
 ### For New Agents
 
 **Start here**:
-1. `/docs/README.md` - Project overview
-2. `/docs/ARCHITECTURE.md` - System design
-3. `/docs/GAME_DESIGN.md` - Game mechanics
-4. `/docs/CODING_STANDARDS.md` - Code style
+1. **`.template/docs/CODING_STANDARDS.md`** - ⚠️ **Code style & Godot 4.x requirements**
+2. `.template/README.md` - Template overview
+3. `.template/docs/ARCHITECTURE.md` - System design
+4. `.template/docs/GAME_DESIGN.md` - Game mechanics
 5. This file - Collaboration rules
 
 ### Reference Materials
 
-- `/docs/API.md` - API documentation
-- `/docs/EXAMPLES.md` - Code examples
-- `/docs/GLOSSARY.md` - Term definitions
-- `/docs/FAQ.md` - Common questions
+- `.template/docs/API.md` - API documentation
+- `.template/docs/EXAMPLES.md` - Code examples
+- `.template/docs/GLOSSARY.md` - Term definitions
+- `.template/docs/FAQ.md` - Common questions
+- `.template/docs/NETWORKING.md` - Multiplayer implementation
+- `.template/docs/AI_SYSTEM.md` - AI opponents
 
 ## 📞 Getting Help
 

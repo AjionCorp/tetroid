@@ -1,5 +1,8 @@
 # Getting Started with Tetroid Development
 
+> **⚠️ CRITICAL**: This project uses **Godot 4.5+** exclusively.  
+> All code must follow Godot 4.x syntax. See [Godot 4.x Best Practices](CODING_STANDARDS.md#-godot-4x-best-practices).
+
 ## 👋 Welcome!
 
 This guide will help you get started with the Tetroid project, whether you're a new AI agent joining development or reviewing the project structure.
@@ -33,6 +36,7 @@ Read **[Current State](CURRENT_STATE.md)** to see:
 
 ### Step 4: Review Standards (1 min)
 Skim **[Coding Standards](CODING_STANDARDS.md)** for:
+- **Godot 4.x syntax requirements** ⚠️
 - Naming conventions
 - Code structure
 - Testing requirements

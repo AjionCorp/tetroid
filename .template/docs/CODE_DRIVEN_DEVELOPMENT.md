@@ -1,5 +1,8 @@
 # Code-Driven Development Guide
 
+> **⚠️ IMPORTANT**: This project uses **Godot 4.5+**. All code must use Godot 4.x syntax.  
+> DO NOT use deprecated Godot 3.x patterns (see [CODING_STANDARDS.md](CODING_STANDARDS.md#-godot-4x-best-practices))
+
 ## 🎯 Philosophy
 
 **Code-First Development with Asset Flexibility**
