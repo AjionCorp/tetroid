@@ -44,27 +44,27 @@ func _process_player_input(player_id: int) -> void:
 	if not _player_actions.has(player_id):
 		return
 	
-	var actions := _player_actions[player_id]
+	var actions = _player_actions[player_id]
 	
 	# Movement (analog - gets value)
-	var move_input := get_move_input(player_id)
+	var move_input = get_move_input(player_id)
 	if abs(move_input) > DEADZONE:
-		emit_signal("paddle_moved", move_input, player_id)
+		paddle_moved.emit(move_input, player_id)
 	
 	# Actions (digital - pressed this frame)
 	for action_name in ["rotate_left", "rotate_right", "place", "ability"]:
 		if Input.is_action_just_pressed(actions[action_name]):
-			emit_signal("action_pressed", action_name, player_id)
+			action_pressed.emit(action_name, player_id)
 		elif Input.is_action_just_released(actions[action_name]):
-			emit_signal("action_released", action_name, player_id)
+			action_released.emit(action_name, player_id)
 
 func get_move_input(player_id: int) -> float:
 	"""Get movement input (-1 = left, 1 = right, 0 = none)"""
 	if not _player_actions.has(player_id):
 		return 0.0
 	
-	var actions := _player_actions[player_id]
-	var input := 0.0
+	var actions = _player_actions[player_id]
+	var input = 0.0
 	
 	# Keyboard
 	if Input.is_action_pressed(actions["left"]):
@@ -74,7 +74,7 @@ func get_move_input(player_id: int) -> float:
 	
 	# Controller support (if connected)
 	# Godot automatically maps controller axes
-	var joy_axis := Input.get_joy_axis(player_id - 1, JOY_AXIS_LEFT_X)
+	var joy_axis = Input.get_joy_axis(player_id - 1, JOY_AXIS_LEFT_X)
 	if abs(joy_axis) > DEADZONE:
 		input = joy_axis
 	
@@ -85,7 +85,7 @@ func is_action_pressed(action: String, player_id: int) -> bool:
 	if not _player_actions.has(player_id):
 		return false
 	
-	var player_action_name := _player_actions[player_id].get(action, "")
+	var player_action_name = _player_actions[player_id].get(action, "")
 	if player_action_name.is_empty():
 		return false
 	
@@ -96,7 +96,7 @@ func is_action_just_pressed(action: String, player_id: int) -> bool:
 	if not _player_actions.has(player_id):
 		return false
 	
-	var player_action_name := _player_actions[player_id].get(action, "")
+	var player_action_name = _player_actions[player_id].get(action, "")
 	if player_action_name.is_empty():
 		return false
 	

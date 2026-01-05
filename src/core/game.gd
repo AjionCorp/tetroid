@@ -17,8 +17,12 @@ var input_system
 ## Entities
 var blocks: Array = []
 
+## UI References (cached for performance)
+var _fps_label: Label = null
+
 ## Delta accumulator for fixed timestep
 var _delta_accumulator: float = 0.0
+const MAX_PHYSICS_STEPS: int = 5  # Prevent spiral of death
 
 func _ready() -> void:
 	print("Game instance created")
@@ -93,11 +97,11 @@ func _create_world() -> void:
 	add_child(label)
 	
 	# Add FPS counter
-	var fps_label := Label.new()
-	fps_label.name = "FPSLabel"
-	fps_label.position = Vector2(10, 10)
-	fps_label.add_theme_color_override("font_color", Constants.COLOR_TEXT_PRIMARY)
-	add_child(fps_label)
+	_fps_label = Label.new()
+	_fps_label.name = "FPSLabel"
+	_fps_label.position = Vector2(10, 10)
+	_fps_label.add_theme_color_override("font_color", Constants.COLOR_TEXT_PRIMARY)
+	add_child(_fps_label)
 	
 	print("Game world created")
 
@@ -142,12 +146,18 @@ func _process(delta: float) -> void:
 	# Update FPS display
 	_update_fps_display()
 	
-	# Fixed timestep update
+	# Fixed timestep update with max steps to prevent spiral of death
 	_delta_accumulator += delta
 	
-	while _delta_accumulator >= Constants.FIXED_DELTA:
+	var steps := 0
+	while _delta_accumulator >= Constants.FIXED_DELTA and steps < MAX_PHYSICS_STEPS:
 		_fixed_update(Constants.FIXED_DELTA)
 		_delta_accumulator -= Constants.FIXED_DELTA
+		steps += 1
+	
+	# If we hit the limit, clamp accumulator to prevent runaway
+	if steps >= MAX_PHYSICS_STEPS:
+		_delta_accumulator = 0.0
 
 func _fixed_update(delta: float) -> void:
 	"""Fixed timestep update for game logic"""
@@ -206,9 +216,8 @@ func _test_activate_abilities() -> void:
 
 func _update_fps_display() -> void:
 	"""Update FPS counter"""
-	var fps_label := get_node_or_null("FPSLabel")
-	if fps_label:
-		fps_label.text = "FPS: " + str(Engine.get_frames_per_second())
+	if _fps_label:
+		_fps_label.text = "FPS: " + str(Engine.get_frames_per_second())
 
 func stop() -> void:
 	"""Stop the game"""

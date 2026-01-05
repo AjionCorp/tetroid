@@ -112,7 +112,7 @@ func destroy() -> void:
 		return
 	
 	is_destroyed = true
-	block_destroyed.emit()
+	emit_signal("block_destroyed")
 	
 	# Play destruction animation
 	_play_destruction_animation()
@@ -175,7 +175,7 @@ func activate_ability() -> bool:
 	# Reset cooldown
 	ability_cooldown = ability_cooldown_max
 	
-	ability_activated.emit()
+	emit_signal("ability_activated")
 	
 	# Visual feedback
 	_play_ability_effect()

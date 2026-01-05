@@ -8,8 +8,9 @@ static func generate_simple_tone(frequency: float, duration: float) -> AudioStre
 	var sample_rate := 44100
 	var samples := int(duration * sample_rate)
 	
+	# Use 16-bit for better quality and compatibility
 	var data := PackedByteArray()
-	data.resize(samples)
+	data.resize(samples * 2)  # 2 bytes per sample for 16-bit
 	
 	for i in range(samples):
 		var t := float(i) / sample_rate
@@ -19,13 +20,16 @@ static func generate_simple_tone(frequency: float, duration: float) -> AudioStre
 		var envelope := 1.0 - (float(i) / samples)
 		value *= envelope
 		
-		# Convert to byte
-		var byte_value := int(clamp(value * 127, -128, 127))
-		data[i] = byte_value
+		# Convert to 16-bit signed integer (-32768 to 32767)
+		var sample_value := int(clamp(value * 32767, -32768, 32767))
+		
+		# Write as little-endian 16-bit
+		data[i * 2] = sample_value & 0xFF
+		data[i * 2 + 1] = (sample_value >> 8) & 0xFF
 	
 	var stream := AudioStreamWAV.new()
 	stream.data = data
-	stream.format = AudioStreamWAV.FORMAT_8_BITS
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
 	stream.mix_rate = sample_rate
 	stream.stereo = false
 	
