@@ -80,6 +80,7 @@ func _initialize_hud() -> void:
 	add_child(hud_layer)
 	
 	game_hud = GameHUD.new()
+	game_hud.end_turn_pressed.connect(_on_end_turn_pressed)
 	hud_layer.add_child(game_hud)
 	print("✓ HUD initialized (overlay)")
 
@@ -176,20 +177,20 @@ func _start_battle() -> void:
 	var board_width = board_manager.board_width * board_manager.cell_size
 	var board_height = board_manager.board_height * board_manager.cell_size
 	
-	# Create PLAYER'S ball (starts near player, attacks AI)
+	# Create PLAYER'S ball (starts AT player paddle)
 	player_ball = Ball.new()
 	player_ball.owner_id = 1
 	player_ball.initialize(
-		Vector2(board_width / 2.0, board_height * 0.75),  # Bottom area
+		Vector2(player_paddle.position.x, player_paddle.position.y - 20),  # On player's paddle
 		Vector2(randf_range(-100, 100), -400)  # Going UP toward AI
 	)
 	board_manager.add_child(player_ball)
 	
-	# Create AI'S ball (starts near AI, attacks player)
+	# Create AI'S ball (starts AT AI paddle)
 	ai_ball = Ball.new()
 	ai_ball.owner_id = 2
 	ai_ball.initialize(
-		Vector2(board_width / 2.0, board_height * 0.25),  # Top area
+		Vector2(ai_paddle.position.x, ai_paddle.position.y + 20),  # On AI's paddle
 		Vector2(randf_range(-100, 100), 400)  # Going DOWN toward player
 	)
 	board_manager.add_child(ai_ball)
@@ -245,8 +246,16 @@ func _on_match_ended(result: GameState.MatchResult) -> void:
 		GameState.MatchResult.PLAYER2_WIN:
 			print("AI WINS!")
 
+func _on_end_turn_pressed() -> void:
+	"""Player pressed End Turn button"""
+	print("Player ended turn early - starting battle!")
+	if game_state and game_state.current_phase == GameState.Phase.DEPLOYMENT:
+		game_state.deployment_time = 0.0  # Force timer to expire
+		# This will trigger phase change in next frame
+
 func _on_paddle_moved(direction: float, player_id: int) -> void:
 	"""Handle paddle movement"""
 	if game_state.current_phase == GameState.Phase.BATTLE:
 		if player_id == 1 and player_paddle:
 			player_paddle.move_with_input(direction)
+			print("Moving player paddle: " + str(direction))

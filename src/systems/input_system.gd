@@ -50,6 +50,7 @@ func _process_player_input(player_id: int) -> void:
 	var move_input: float = get_move_input(player_id)
 	if abs(move_input) > DEADZONE:
 		paddle_moved.emit(move_input, player_id)
+		print("Paddle move input: " + str(move_input) + " for player " + str(player_id))
 	
 	# Actions (digital - pressed this frame)
 	var action_names: Array = ["rotate_left", "rotate_right", "place", "ability"]

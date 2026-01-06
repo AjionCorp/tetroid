@@ -7,6 +7,7 @@ extends Control
 ## References
 var timer_label: Label
 var phase_label: Label
+var end_turn_button: Button
 
 ## Player 1 UI (top right)
 var p1_hp_label: Label
@@ -17,6 +18,8 @@ var p1_blocks_label: Label
 var p2_hp_label: Label
 var p2_score_label: Label
 var p2_blocks_label: Label
+
+signal end_turn_pressed()
 
 func _ready() -> void:
 	# Fill screen
@@ -164,6 +167,30 @@ func _create_center_display() -> void:
 	instructions.add_theme_color_override("font_color", Color.YELLOW)
 	instructions.add_theme_font_size_override("font_size", 18)
 	center.add_child(instructions)
+	
+	# End Turn button
+	end_turn_button = Button.new()
+	end_turn_button.text = "END TURN (Start Battle)"
+	end_turn_button.custom_minimum_size = Vector2(250, 50)
+	
+	var btn_style = StyleBoxFlat.new()
+	btn_style.bg_color = Color(0.2, 0.6, 0.2)
+	btn_style.corner_radius_top_left = 5
+	btn_style.corner_radius_top_right = 5
+	btn_style.corner_radius_bottom_left = 5
+	btn_style.corner_radius_bottom_right = 5
+	
+	end_turn_button.add_theme_stylebox_override("normal", btn_style)
+	end_turn_button.add_theme_color_override("font_color", Color.WHITE)
+	end_turn_button.add_theme_font_size_override("font_size", 18)
+	end_turn_button.pressed.connect(_on_end_turn_pressed)
+	center.add_child(end_turn_button)
+
+func _on_end_turn_pressed() -> void:
+	"""End Turn button pressed"""
+	end_turn_pressed.emit()
+	if end_turn_button:
+		end_turn_button.hide()
 
 func update_timer(time: float) -> void:
 	"""Update deployment timer"""
@@ -187,6 +214,8 @@ func update_phase(phase_name: String) -> void:
 			phase_label.add_theme_color_override("font_color", Color.RED)
 			if timer_label:
 				timer_label.hide()  # Hide timer in battle
+			if end_turn_button:
+				end_turn_button.hide()  # Hide button in battle
 
 func update_player_hp(player_id: int, hp: int) -> void:
 	"""Update player HP display"""
