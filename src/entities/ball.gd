@@ -10,7 +10,8 @@ var ball_type: Constants.BallType = Constants.BallType.NORMAL
 var velocity: Vector2 = Vector2(0, -400)  # Start moving up
 var speed: float = 400.0
 var damage: int = 10
-var owner_id: int = 0  # Who last hit it
+var owner_id: int = 0  # Original owner (NEVER changes)
+var last_hit_by: int = 0  # Who last deflected it (for collision logic)
 
 ## Visual
 var sprite: Sprite2D
@@ -36,6 +37,9 @@ func initialize(start_position: Vector2, start_velocity: Vector2) -> void:
 	position = start_position
 	velocity = start_velocity
 	speed = velocity.length()
+	
+	# Initially, last_hit_by is same as owner
+	last_hit_by = owner_id
 	
 	# Create visuals now (after owner_id is set)
 	_create_visuals()
@@ -134,23 +138,14 @@ func bounce(normal: Vector2) -> void:
 	velocity = velocity.normalized() * speed
 
 func hit_by_paddle(paddle_velocity: float, hit_position: float, paddle_player_id: int) -> void:
-	"""Ball hit by paddle - ownership transfers to paddle owner!"""
-	# CRITICAL: Ball ownership changes to whoever hit it!
-	var old_owner = owner_id
-	owner_id = paddle_player_id
+	"""Ball hit by paddle - track who last hit it"""
+	# Track who last deflected this ball (for collision logic)
+	last_hit_by = paddle_player_id
 	
-	if old_owner != owner_id:
-		print("Ball ownership changed: P" + str(old_owner) + " → P" + str(owner_id))
-		# Update ball color to match new owner
-		if sprite:
-			if owner_id == 1:
-				sprite.modulate = Color.CYAN  # Player's ball
-				if trail:
-					trail.default_color = Color(0, 1, 1, 0.6)
-			else:
-				sprite.modulate = Color.RED  # AI's ball
-				if trail:
-					trail.default_color = Color(1, 0, 0, 0.6)
+	# Ball color STAYS with original owner (never changes)
+	# Only last_hit_by changes
+	
+	print("Ball (owner=" + str(owner_id) + ") deflected by P" + str(paddle_player_id))
 	
 	# Reflect in the correct direction based on which paddle
 	if paddle_player_id == 1:

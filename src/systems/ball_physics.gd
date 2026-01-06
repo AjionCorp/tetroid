@@ -134,11 +134,15 @@ func _check_block_collision(ball) -> void:
 		if block.has_meta("phased") and block.get_meta("phased"):
 			continue
 		
-		# OWNERSHIP CHECK:
-		# - Your ball PASSES THROUGH your own blocks (owner_id same)
-		# - Your ball BOUNCES OFF enemy blocks (owner_id different) and damages them
-		if ball.owner_id == block.owner_id:
-			# Ball passes through own blocks - no collision
+		# COLLISION LOGIC (uses last_hit_by):
+		# - Ball passes through blocks of whoever LAST HIT IT
+		# - Prevents deflected enemy balls from hitting deflector's blocks
+		# - Ball damages blocks of the OTHER player
+		
+		var pass_through_player = ball.last_hit_by if ball.last_hit_by > 0 else ball.owner_id
+		
+		if pass_through_player == block.owner_id:
+			# Ball passes through blocks of whoever last hit it
 			continue
 		
 		# Ball hits ENEMY block - bounce and damage!
