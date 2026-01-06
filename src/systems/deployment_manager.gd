@@ -72,18 +72,28 @@ func _create_piece_group(piece_type: String, grid_pos: Vector2i, owner: int, boa
 
 func select_piece_at(click_pos: Vector2, board_manager) -> bool:
 	"""Try to select a piece at click position"""
-	var grid_pos = board_manager.screen_to_grid(click_pos)
+	# Adjust for board offset
+	var local_pos = click_pos - board_manager.position
+	var grid_pos = Vector2i(
+		int(local_pos.x / board_manager.cell_size),
+		int(local_pos.y / board_manager.cell_size)
+	)
+	
+	print("Click at screen: " + str(click_pos) + " → grid: " + str(grid_pos))
 	
 	# Find which piece was clicked
 	for piece_group in deployed_pieces:
 		for block in piece_group.blocks:
-			if is_instance_valid(block) and block.grid_position == grid_pos:
-				selected_piece = piece_group
-				is_dragging = true
-				print("Selected " + piece_group.type)
-				_highlight_piece(piece_group, true)
-				return true
+			if is_instance_valid(block):
+				print("  Checking block at: " + str(block.grid_position))
+				if block.grid_position == grid_pos:
+					selected_piece = piece_group
+					is_dragging = true
+					print("✓ Selected " + piece_group.type + " piece!")
+					_highlight_piece(piece_group, true)
+					return true
 	
+	print("✗ No piece found at " + str(grid_pos))
 	return false
 
 func move_selected_piece(new_pos: Vector2, board_manager) -> void:
@@ -91,7 +101,12 @@ func move_selected_piece(new_pos: Vector2, board_manager) -> void:
 	if not selected_piece or not is_dragging:
 		return
 	
-	var new_grid_pos = board_manager.screen_to_grid(new_pos)
+	# Adjust for board offset
+	var local_pos = new_pos - board_manager.position
+	var new_grid_pos = Vector2i(
+		int(local_pos.x / board_manager.cell_size),
+		int(local_pos.y / board_manager.cell_size)
+	)
 	
 	# Calculate new block positions
 	var new_positions = BlockFactory.calculate_piece_positions(

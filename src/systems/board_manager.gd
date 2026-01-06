@@ -182,9 +182,11 @@ func is_position_valid(grid_pos: Vector2i) -> bool:
 
 func screen_to_grid(screen_pos: Vector2) -> Vector2i:
 	"""Convert screen position to grid position"""
+	# Adjust for board offset (board may be centered)
+	var local_pos = screen_pos - position
 	return Vector2i(
-		int(screen_pos.x / cell_size),
-		int(screen_pos.y / cell_size)
+		int(local_pos.x / cell_size),
+		int(local_pos.y / cell_size)
 	)
 
 func grid_to_screen(grid_pos: Vector2i) -> Vector2:
