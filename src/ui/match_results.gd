@@ -14,7 +14,11 @@ var enemy_score: int = 0
 
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
+	visible = true
+	z_index = 1000  # Very high z-index
+	mouse_filter = Control.MOUSE_FILTER_STOP  # Capture all mouse input
 	_create_results_ui()
+	print("MatchResults _ready() called")
 
 func set_results(is_victory: bool, p1_hp: int, p2_hp: int, p1_score: int, p2_score: int) -> void:
 	"""Set match results data"""
@@ -24,15 +28,37 @@ func set_results(is_victory: bool, p1_hp: int, p2_hp: int, p1_score: int, p2_sco
 	player_score = p1_score
 	enemy_score = p2_score
 	
-	_update_display()
+	print("Setting results: " + result_type + " | P1 HP: " + str(p1_hp) + " | P2 HP: " + str(p2_hp))
+	
+	# Force update display immediately
+	call_deferred("_update_display")
 
 func _create_results_ui() -> void:
 	"""Create results screen UI"""
-	# Dark overlay
+	print("Creating results UI...")
+	
+	# Dark overlay (very visible)
 	var overlay = ColorRect.new()
-	overlay.color = Color(0, 0, 0, 0.8)
+	overlay.color = Color(0, 0, 0, 0.95)  # Almost opaque
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 0
 	add_child(overlay)
+	print("  Added overlay")
+	
+	# Bright test border to confirm screen is there
+	var test_border = ColorRect.new()
+	test_border.color = Color.TRANSPARENT
+	var border_style = StyleBoxFlat.new()
+	border_style.bg_color = Color.TRANSPARENT
+	border_style.border_width_left = 5
+	border_style.border_width_right = 5
+	border_style.border_width_top = 5
+	border_style.border_width_bottom = 5
+	border_style.border_color = Color.RED
+	test_border.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(test_border)
+	print("  Added test border (should see red border on screen)")
 	
 	# Center container (properly centered)
 	var center = VBoxContainer.new()
@@ -49,8 +75,10 @@ func _create_results_ui() -> void:
 	result_label.name = "ResultLabel"
 	result_label.text = result_type
 	result_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	result_label.add_theme_color_override("font_color", Color.WHITE)  # Default white
 	result_label.add_theme_font_size_override("font_size", 72)
 	center.add_child(result_label)
+	print("  Added result label: " + result_type)
 	
 	# Divider
 	var separator = HSeparator.new()
