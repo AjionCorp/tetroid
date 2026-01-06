@@ -62,28 +62,42 @@ func create_board() -> void:
 	_draw_territory_borders()
 
 func _draw_grid() -> void:
-	"""Draw subtle grid lines"""
+	"""Draw subtle grid lines for EVERY square"""
 	var grid = Node2D.new()
 	grid.name = "Grid"
 	grid.z_index = -50
 	add_child(grid)
 	
-	# Vertical lines (every 5 cells)
-	for x in range(0, board_width + 1, 5):
+	# Vertical lines (EVERY cell)
+	for x in range(board_width + 1):
 		var line = Line2D.new()
 		line.add_point(Vector2(x * cell_size, 0))
 		line.add_point(Vector2(x * cell_size, board_height * cell_size))
-		line.default_color = Color(0.1, 0.1, 0.15, 0.3)
-		line.width = 1
+		
+		# Thicker line every 10 cells
+		if x % 10 == 0:
+			line.default_color = Color(0.15, 0.15, 0.2, 0.5)
+			line.width = 1
+		else:
+			line.default_color = Color(0.08, 0.08, 0.12, 0.3)
+			line.width = 1
+		
 		grid.add_child(line)
 	
-	# Horizontal lines (every 5 cells)
-	for y in range(0, board_height + 1, 5):
+	# Horizontal lines (EVERY cell)
+	for y in range(board_height + 1):
 		var line = Line2D.new()
 		line.add_point(Vector2(0, y * cell_size))
 		line.add_point(Vector2(board_width * cell_size, y * cell_size))
-		line.default_color = Color(0.1, 0.1, 0.15, 0.3)
-		line.width = 1
+		
+		# Thicker line every 10 cells
+		if y % 10 == 0:
+			line.default_color = Color(0.15, 0.15, 0.2, 0.5)
+			line.width = 1
+		else:
+			line.default_color = Color(0.08, 0.08, 0.12, 0.3)
+			line.width = 1
+		
 		grid.add_child(line)
 
 func _draw_neutral_zone() -> void:

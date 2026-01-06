@@ -87,18 +87,19 @@ func _initialize_hud() -> void:
 func _initialize_players() -> void:
 	"""Initialize player paddles"""
 	var board_width_px = board_manager.board_width * board_manager.cell_size
+	var board_height_px = board_manager.board_height * board_manager.cell_size
 	
-	# Human player paddle (BOTTOM - just below neutral zone)
+	# Human player paddle (AT VERY BOTTOM - Arkanoid style)
 	player_paddle = Paddle.new()
-	player_paddle.initialize(1, 34 * board_manager.cell_size, board_width_px)
+	player_paddle.initialize(1, board_height_px - 10, board_width_px)  # 10px from bottom edge
 	board_manager.add_child(player_paddle)
 	
-	# AI paddle (TOP - just above neutral zone)
+	# AI paddle (AT VERY TOP - Arkanoid style)
 	ai_paddle = Paddle.new()
-	ai_paddle.initialize(2, 28 * board_manager.cell_size, board_width_px)
+	ai_paddle.initialize(2, 10, board_width_px)  # 10px from top edge
 	board_manager.add_child(ai_paddle)
 	
-	print("✓ Paddles created (width: " + str(board_width_px) + "px)")
+	DebugLogger.log_info("Paddles created at edges (Player=bottom, AI=top)", "GAME")
 
 func _start_deployment() -> void:
 	"""Start deployment phase"""
