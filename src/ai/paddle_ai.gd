@@ -38,10 +38,10 @@ func update_ai(delta: float) -> void:
 	if own_ball and own_ball.is_attached and own_ball.attached_paddle == paddle:
 		await get_tree().create_timer(0.5).timeout
 		if own_ball.is_attached:
-			# Aim at strategic target (center or random)
-			var angle = randf_range(-2.0 * PI / 3.0, -PI / 3.0) + PI  # Downward spread
+			# Aim downward toward player (PI/2 = 90° down, ±30° spread)
+			var angle = PI / 2.0 + randf_range(-PI/6.0, PI/6.0)  # 60° to 120° (downward cone)
 			own_ball.launch_from_paddle(angle)
-			print("AI launched ball strategically!")
+			print("AI launched RED ball downward at " + str(rad_to_deg(angle)) + "°")
 		return
 	
 	# Priority 2: Defend against ENEMY ball if it's coming toward AI

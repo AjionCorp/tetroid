@@ -67,7 +67,15 @@ func _process(_delta: float) -> void:
 	# If attached to paddle, follow it
 	if is_attached and attached_paddle:
 		position.x = attached_paddle.position.x + attach_offset
-		position.y = attached_paddle.position.y - 20  # Above paddle
+		
+		# Position based on which paddle (top or bottom)
+		if attached_paddle.player_id == 1:
+			# Bottom paddle - ball ABOVE it
+			position.y = attached_paddle.position.y - 20
+		else:
+			# Top paddle - ball BELOW it
+			position.y = attached_paddle.position.y + 20
+		
 		velocity = Vector2.ZERO  # No velocity while attached
 	
 	# Update trail
@@ -79,13 +87,26 @@ func attach_to_paddle(paddle) -> void:
 	attached_paddle = paddle
 	attach_offset = 0.0  # Center of paddle
 	is_active = false  # Stop physics
-	print("Ball attached to P" + str(paddle.player_id) + " paddle - Click to launch!")
+	
+	# Position ball correctly based on which paddle
+	if paddle.player_id == 1:
+		# Bottom paddle - ball ABOVE it
+		position.x = paddle.position.x
+		position.y = paddle.position.y - 20
+	else:
+		# Top paddle - ball BELOW it
+		position.x = paddle.position.x
+		position.y = paddle.position.y + 20
+	
+	print("Ball (owner=" + str(owner_id) + ") attached to P" + str(paddle.player_id) + " paddle at " + str(position))
 	emit_signal("ball_attached_to_paddle", self, paddle)
 
 func launch_from_paddle(aim_angle: float) -> void:
 	"""Launch ball from paddle with given angle"""
 	if not is_attached:
 		return
+	
+	var launching_paddle_id = attached_paddle.player_id if attached_paddle else 0
 	
 	is_attached = false
 	attached_paddle = null
@@ -94,7 +115,7 @@ func launch_from_paddle(aim_angle: float) -> void:
 	# Launch with specified angle
 	velocity = Vector2(cos(aim_angle), sin(aim_angle)) * speed
 	
-	print("Ball launched at angle: " + str(rad_to_deg(aim_angle)) + "°")
+	print("Ball (owner=" + str(owner_id) + ") launched from P" + str(launching_paddle_id) + " paddle at angle: " + str(rad_to_deg(aim_angle)) + "° | Velocity: " + str(velocity))
 
 func _update_trail() -> void:
 	"""Update trail effect"""
