@@ -55,7 +55,7 @@ func _process_player_input(player_id: int) -> void:
 	var action_names: Array = ["rotate_left", "rotate_right", "place", "ability"]
 	for action_name in action_names:
 		var action_key: String = actions.get(action_name, "")
-		if not action_key.is_empty():
+		if not action_key.is_empty() and InputMap.has_action(action_key):
 			if Input.is_action_just_pressed(action_key):
 				action_pressed.emit(action_name, player_id)
 			elif Input.is_action_just_released(action_key):
@@ -73,10 +73,14 @@ func get_move_input(player_id: int) -> float:
 	var left_action: String = actions.get("left", "")
 	var right_action: String = actions.get("right", "")
 	
-	if not left_action.is_empty() and Input.is_action_pressed(left_action):
-		input -= 1.0
-	if not right_action.is_empty() and Input.is_action_pressed(right_action):
-		input += 1.0
+	# Check if actions exist in InputMap before using them
+	if not left_action.is_empty() and InputMap.has_action(left_action):
+		if Input.is_action_pressed(left_action):
+			input -= 1.0
+	
+	if not right_action.is_empty() and InputMap.has_action(right_action):
+		if Input.is_action_pressed(right_action):
+			input += 1.0
 	
 	# Controller support (if connected)
 	# Godot automatically maps controller axes
@@ -92,7 +96,7 @@ func is_action_pressed(action: String, player_id: int) -> bool:
 		return false
 	
 	var player_action_name: String = _player_actions[player_id].get(action, "")
-	if player_action_name.is_empty():
+	if player_action_name.is_empty() or not InputMap.has_action(player_action_name):
 		return false
 	
 	return Input.is_action_pressed(player_action_name)
@@ -103,7 +107,7 @@ func is_action_just_pressed(action: String, player_id: int) -> bool:
 		return false
 	
 	var player_action_name: String = _player_actions[player_id].get(action, "")
-	if player_action_name.is_empty():
+	if player_action_name.is_empty() or not InputMap.has_action(player_action_name):
 		return false
 	
 	return Input.is_action_just_pressed(player_action_name)
