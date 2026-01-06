@@ -137,25 +137,37 @@ func _input(event: InputEvent) -> void:
 				_handle_click_placement(event.position)
 
 func _handle_click_placement(click_pos: Vector2) -> void:
-	"""Handle clicking to place block"""
+	"""Handle clicking to place Tetris piece"""
 	if not game_state.can_place_block(1):
-		print("No more blocks to place!")
+		print("No more pieces to place!")
 		return
 	
-	# Convert to grid position
+	# Convert to grid position (this is the anchor point)
 	var grid_pos = board_manager.screen_to_grid(click_pos)
 	
-	# Validate position
-	if not board_manager.is_position_valid(grid_pos):
-		print("Invalid position! (Out of bounds or neutral zone)")
+	# Get current piece type
+	var piece_type = player_pieces[current_piece_index]
+	
+	# Calculate all block positions for this piece shape
+	var block_positions = BlockFactory.calculate_piece_positions(piece_type, grid_pos, 0)
+	
+	# Validate all positions
+	var all_valid = true
+	for pos in block_positions:
+		if not board_manager.is_position_valid(pos):
+			all_valid = false
+			break
+	
+	if not all_valid:
+		print("Cannot place piece there! (Out of bounds or overlaps neutral zone)")
 		return
 	
-	# Place block
-	var piece_type = player_pieces[current_piece_index]
-	var block = BlockFactory.create_block(piece_type, grid_pos, 1)
+	# Create all blocks for the Tetris piece
+	var piece_blocks = BlockFactory.create_block_grid(piece_type, block_positions, 1)
 	
-	if block:
-		board_manager.add_block(block)
+	if piece_blocks.size() > 0:
+		for block in piece_blocks:
+			board_manager.add_block(block)
 		
 		game_state.register_block_placed(1)
 		current_piece_index += 1
@@ -163,20 +175,39 @@ func _handle_click_placement(click_pos: Vector2) -> void:
 		game_hud.update_blocks_remaining(1, current_piece_index, 5)
 		
 		if current_piece_index < player_pieces.size():
-			print("Placed " + piece_type + "! Next: " + player_pieces[current_piece_index])
+			print("Placed " + piece_type + " (" + str(piece_blocks.size()) + " blocks)! Next: " + player_pieces[current_piece_index])
 		else:
-			print("All your blocks placed!")
+			print("All your pieces placed!")
 
 func _on_ai_place_block(piece_type: String, grid_pos: Vector2i) -> void:
-	"""AI places a block"""
+	"""AI places a Tetris piece"""
 	if not game_state.can_place_block(2):
 		return
 	
-	var block = BlockFactory.create_block(piece_type, grid_pos, 2)
-	if block:
-		board_manager.add_block(block)
+	# Calculate all block positions for piece shape
+	var block_positions = BlockFactory.calculate_piece_positions(piece_type, grid_pos, 0)
+	
+	# Validate all positions
+	var all_valid = true
+	for pos in block_positions:
+		if not board_manager.is_position_valid(pos):
+			all_valid = false
+			break
+	
+	if not all_valid:
+		print("AI tried invalid placement, retrying...")
+		return
+	
+	# Create all blocks for the piece
+	var piece_blocks = BlockFactory.create_block_grid(piece_type, block_positions, 2)
+	
+	if piece_blocks.size() > 0:
+		for block in piece_blocks:
+			board_manager.add_block(block)
+		
 		game_state.register_block_placed(2)
 		game_hud.update_blocks_remaining(2, game_state.player2_blocks_placed, 5)
+		print("AI placed " + piece_type + " (" + str(piece_blocks.size()) + " blocks)")
 
 func _on_phase_changed(new_phase: GameState.Phase) -> void:
 	"""Phase changed"""

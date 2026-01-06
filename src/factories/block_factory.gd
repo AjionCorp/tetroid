@@ -79,14 +79,14 @@ static func create_block_grid(piece_type: String, grid_positions: Array, owner_i
 
 static func get_tetris_piece_shape(piece_type: String) -> Array:
 	"""Get the shape configuration for a Tetris piece"""
-	var config := BlockData.get_config(piece_type)
+	var config: Dictionary = BlockData.get_config(piece_type)
 	if config.has("shape"):
 		return config.shape
 	return []
 
 static func calculate_piece_positions(piece_type: String, center_pos: Vector2i, rotation: int = 0) -> Array:
 	"""Calculate grid positions for all blocks in a piece"""
-	var shape := get_tetris_piece_shape(piece_type)
+	var shape: Array = get_tetris_piece_shape(piece_type)
 	if shape.is_empty():
 		return []
 	
@@ -97,7 +97,7 @@ static func calculate_piece_positions(piece_type: String, center_pos: Vector2i, 
 		var row = shape[y]
 		for x in range(row.size()):
 			if row[x] == 1:
-				var pos := Vector2i(
+				var pos: Vector2i = Vector2i(
 					center_pos.x + x,
 					center_pos.y + y
 				)
@@ -106,6 +106,8 @@ static func calculate_piece_positions(piece_type: String, center_pos: Vector2i, 
 	# Apply rotation if needed
 	if rotation != 0:
 		positions = _rotate_positions(positions, center_pos, rotation)
+	
+	print("Piece " + piece_type + " created " + str(positions.size()) + " blocks at " + str(center_pos))
 	
 	return positions
 

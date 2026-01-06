@@ -130,9 +130,14 @@ func _create_stat_panel(pos: Vector2, title: String, color: Color) -> PanelConta
 func _create_center_display() -> void:
 	"""Create center timer/phase display"""
 	var center = VBoxContainer.new()
-	center.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	center.offset_top = 20
-	center.custom_minimum_size = Vector2(300, 150)
+	# Properly center using anchors
+	center.anchor_left = 0.5
+	center.anchor_right = 0.5
+	center.anchor_top = 0.0
+	center.offset_left = -200  # Half of width
+	center.offset_right = 200  # Half of width
+	center.offset_top = 30
+	center.offset_bottom = 200
 	center.alignment = BoxContainer.ALIGNMENT_CENTER
 	add_child(center)
 	
@@ -141,7 +146,7 @@ func _create_center_display() -> void:
 	phase_label.text = "DEPLOYMENT PHASE"
 	phase_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	phase_label.add_theme_color_override("font_color", Color.YELLOW)
-	phase_label.add_theme_font_size_override("font_size", 24)
+	phase_label.add_theme_font_size_override("font_size", 32)
 	center.add_child(phase_label)
 	
 	# Timer
@@ -149,15 +154,15 @@ func _create_center_display() -> void:
 	timer_label.text = "90"
 	timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	timer_label.add_theme_color_override("font_color", Color.GREEN)
-	timer_label.add_theme_font_size_override("font_size", 48)
+	timer_label.add_theme_font_size_override("font_size", 64)
 	center.add_child(timer_label)
 	
 	# Instructions
 	var instructions = Label.new()
-	instructions.text = "Click anywhere to place blocks!\n(Except neutral line)"
+	instructions.text = "Place Tetris Pieces Anywhere!\n(Except neutral zone)"
 	instructions.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	instructions.add_theme_color_override("font_color", Constants.COLOR_TEXT_SECONDARY)
-	instructions.add_theme_font_size_override("font_size", 14)
+	instructions.add_theme_font_size_override("font_size", 16)
 	center.add_child(instructions)
 
 func update_timer(time: float) -> void:
