@@ -11,6 +11,7 @@ var ball_physics
 var input_system
 var deployment_ai
 var paddle_ai
+var deployment_manager  # Handles piece movement/rotation
 
 ## UI
 var game_hud
@@ -20,10 +21,6 @@ var ball
 var player_paddle  # Bottom paddle (human)
 var ai_paddle      # Top paddle (AI)
 
-## Player data
-var player_pieces: Array = []
-var ai_pieces: Array = []
-var current_piece_index: int = 0
 
 func _ready() -> void:
 	print("Game initialized")
@@ -103,114 +100,62 @@ func _initialize_players() -> void:
 	DebugLogger.log_info("Paddles created at edges (Player=bottom, AI=top)", "GAME")
 
 func _start_deployment() -> void:
-	"""Start deployment phase"""
-	# Generate random pieces
-	player_pieces = _generate_random_pieces(5)
-	ai_pieces = _generate_random_pieces(5)
-	current_piece_index = 0
+	"""Start deployment phase with pre-placed pieces"""
+	print("=== DEPLOYMENT PHASE ===")
+	print("Pieces are PRE-PLACED. Click to select, drag to move, R to rotate!")
 	
-	print("Your pieces: " + str(player_pieces))
-	print("Click anywhere to place piece: " + player_pieces[0])
+	# Create deployment manager
+	deployment_manager = DeploymentManager.new()
+	deployment_manager.player_id = 1
+	add_child(deployment_manager)
+	
+	# Pre-place player pieces (2 of one type, 3 of another)
+	var player_piece_groups = deployment_manager.create_starting_pieces(1, board_manager)
+	print("Player has " + str(player_piece_groups.size()) + " pieces pre-placed")
+	
+	# Pre-place AI pieces (hidden in their territory)
+	var ai_deployment = DeploymentManager.new()
+	ai_deployment.player_id = 2
+	add_child(ai_deployment)
+	var ai_piece_groups = ai_deployment.create_starting_pieces(2, board_manager)
+	print("AI has " + str(ai_piece_groups.size()) + " pieces pre-placed")
 	
 	# Start game state
 	game_state.start_deployment()
 	
-	# Initialize AI deployment
-	deployment_ai = DeploymentAI.new()
-	deployment_ai.player_id = 2
-	deployment_ai.ai_place_block.connect(_on_ai_place_block)
-	add_child(deployment_ai)
-	deployment_ai.start_deployment(ai_pieces)
-
-func _generate_random_pieces(count: int) -> Array:
-	"""Generate random Tetris pieces"""
-	var pieces = []
-	var all_types = ["I_PIECE", "O_PIECE", "T_PIECE", "S_PIECE", "Z_PIECE", "J_PIECE", "L_PIECE"]
-	
-	for i in range(count):
-		pieces.append(all_types[randi() % all_types.size()])
-	
-	return pieces
+	# Mark all pieces as "placed" since they're pre-placed
+	game_state.player1_blocks_placed = 5
+	game_state.player2_blocks_placed = 5
+	game_hud.update_blocks_remaining(1, 5, 5)
+	game_hud.update_blocks_remaining(2, 5, 5)
 
 func _input(event: InputEvent) -> void:
-	"""Handle mouse clicks for block placement"""
-	if event is InputEventMouseButton and event.pressed:
+	"""Handle input for deployment phase"""
+	if game_state.current_phase != GameState.Phase.DEPLOYMENT:
+		return
+	
+	if not deployment_manager:
+		return
+	
+	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
-			if game_state.current_phase == GameState.Phase.DEPLOYMENT:
-				_handle_click_placement(event.position)
+			if event.pressed:
+				# Mouse down - select piece
+				deployment_manager.select_piece_at(event.position, board_manager)
+			else:
+				# Mouse up - deselect
+				deployment_manager.deselect_piece()
+	
+	elif event is InputEventMouseMotion:
+		# Dragging - move selected piece
+		if deployment_manager.is_dragging:
+			deployment_manager.move_selected_piece(event.position, board_manager)
+	
+	elif event is InputEventKey:
+		if event.pressed and event.keycode == KEY_R:
+			# R key - rotate selected piece
+			deployment_manager.rotate_selected_piece(board_manager)
 
-func _handle_click_placement(click_pos: Vector2) -> void:
-	"""Handle clicking to place Tetris piece"""
-	if not game_state.can_place_block(1):
-		print("No more pieces to place!")
-		return
-	
-	# Convert to grid position (this is the anchor point)
-	var grid_pos = board_manager.screen_to_grid(click_pos)
-	
-	# Get current piece type
-	var piece_type = player_pieces[current_piece_index]
-	
-	# Calculate all block positions for this piece shape
-	var block_positions = BlockFactory.calculate_piece_positions(piece_type, grid_pos, 0)
-	
-	# Validate all positions
-	var all_valid = true
-	for pos in block_positions:
-		if not board_manager.is_position_valid(pos):
-			all_valid = false
-			break
-	
-	if not all_valid:
-		print("Cannot place piece there! (Out of bounds or overlaps neutral zone)")
-		return
-	
-	# Create all blocks for the Tetris piece
-	var piece_blocks = BlockFactory.create_block_grid(piece_type, block_positions, 1)
-	
-	if piece_blocks.size() > 0:
-		for block in piece_blocks:
-			board_manager.add_block(block)
-		
-		game_state.register_block_placed(1)
-		current_piece_index += 1
-		
-		game_hud.update_blocks_remaining(1, current_piece_index, 5)
-		
-		if current_piece_index < player_pieces.size():
-			print("Placed " + piece_type + " (" + str(piece_blocks.size()) + " blocks)! Next: " + player_pieces[current_piece_index])
-		else:
-			print("All your pieces placed!")
-
-func _on_ai_place_block(piece_type: String, grid_pos: Vector2i) -> void:
-	"""AI places a Tetris piece"""
-	if not game_state.can_place_block(2):
-		return
-	
-	# Calculate all block positions for piece shape
-	var block_positions = BlockFactory.calculate_piece_positions(piece_type, grid_pos, 0)
-	
-	# Validate all positions
-	var all_valid = true
-	for pos in block_positions:
-		if not board_manager.is_position_valid(pos):
-			all_valid = false
-			break
-	
-	if not all_valid:
-		print("AI tried invalid placement, retrying...")
-		return
-	
-	# Create all blocks for the piece
-	var piece_blocks = BlockFactory.create_block_grid(piece_type, block_positions, 2)
-	
-	if piece_blocks.size() > 0:
-		for block in piece_blocks:
-			board_manager.add_block(block)
-		
-		game_state.register_block_placed(2)
-		game_hud.update_blocks_remaining(2, game_state.player2_blocks_placed, 5)
-		print("AI placed " + piece_type + " (" + str(piece_blocks.size()) + " blocks)")
 
 func _on_phase_changed(new_phase: GameState.Phase) -> void:
 	"""Phase changed"""

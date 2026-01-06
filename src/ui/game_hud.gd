@@ -159,7 +159,7 @@ func _create_center_display() -> void:
 	
 	# Instructions
 	var instructions = Label.new()
-	instructions.text = "Place Tetris Pieces Anywhere!\n(Except neutral zone)"
+	instructions.text = "Rearrange your pieces!\nClick & Drag to Move | R to Rotate"
 	instructions.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	instructions.add_theme_color_override("font_color", Constants.COLOR_TEXT_SECONDARY)
 	instructions.add_theme_font_size_override("font_size", 16)
