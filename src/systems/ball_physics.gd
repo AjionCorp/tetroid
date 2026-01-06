@@ -8,6 +8,10 @@ var ball: Ball
 var board_manager: BoardManager
 var paddles: Array = []
 
+## Collision cooldown to prevent double-hits
+var paddle_collision_cooldown: float = 0.0
+const PADDLE_COOLDOWN_TIME: float = 0.1  # 100ms cooldown
+
 signal ball_hit_block(ball: Ball, block: Block)
 signal ball_hit_paddle(ball: Ball, paddle: Paddle)
 signal ball_missed(player_id: int)
@@ -32,6 +36,10 @@ func update_physics(delta: float) -> void:
 	if not ball or not ball.is_active:
 		return
 	
+	# Update cooldowns
+	if paddle_collision_cooldown > 0:
+		paddle_collision_cooldown -= delta
+	
 	# Move ball
 	ball.position += ball.velocity * delta
 	
@@ -54,13 +62,37 @@ func _check_wall_collision() -> void:
 
 func _check_paddle_collision() -> void:
 	"""Check collision with paddles"""
+	# Skip if in cooldown (prevents double-bounce)
+	if paddle_collision_cooldown > 0:
+		return
+	
 	for paddle in paddles:
-		if paddle and paddle.check_ball_collision(ball.position, 4):
-			# Ball hit paddle
-			var hit_pos = paddle.get_hit_position(ball.position.x)
+		if not paddle:
+			continue
+		
+		# Check collision with proper bounds
+		var paddle_rect = Rect2(
+			paddle.position.x - paddle.paddle_width / 2.0,
+			paddle.position.y - 4,
+			paddle.paddle_width,
+			8
+		)
+		
+		var ball_rect = Rect2(
+			ball.position.x - 4,
+			ball.position.y - 4,
+			8,
+			8
+		)
+		
+		if paddle_rect.intersects(ball_rect):
+			# Ball hit paddle!
+			var hit_pos = (ball.position.x - paddle.position.x) / (paddle.paddle_width / 2.0)
 			ball.hit_by_paddle(paddle.velocity, hit_pos)
+			paddle_collision_cooldown = PADDLE_COOLDOWN_TIME  # Set cooldown
 			emit_signal("ball_hit_paddle", ball, paddle)
-			print("Ball hit paddle!")
+			print("Ball hit " + ("AI" if paddle.player_id == 2 else "Player") + " paddle!")
+			return  # Only one paddle per frame
 
 func _check_block_collision() -> void:
 	"""Check collision with blocks"""

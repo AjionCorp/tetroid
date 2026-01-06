@@ -10,6 +10,7 @@ var board_manager: BoardManager
 var ball_physics: BallPhysics
 var input_system: InputSystem
 var deployment_ai: DeploymentAI
+var paddle_ai: PaddleAI
 
 ## UI
 var game_hud: GameHUD
@@ -228,7 +229,7 @@ func _start_battle() -> void:
 	
 	ball = Ball.new()
 	ball.initialize(
-		Vector2(board_width / 2, board_height / 2),
+		Vector2(board_width / 2.0, board_height / 2.0),
 		Vector2(0, 400)  # Start going DOWN toward player
 	)
 	board_manager.add_child(ball)
@@ -242,13 +243,21 @@ func _start_battle() -> void:
 	ball_physics.ball_missed.connect(_on_ball_missed)
 	add_child(ball_physics)
 	
-	print("Ball spawned - FIGHT!")
+	# Initialize AI paddle controller
+	paddle_ai = PaddleAI.new()
+	paddle_ai.set_paddle(ai_paddle)
+	paddle_ai.set_ball(ball)
+	add_child(paddle_ai)
+	
+	DebugLogger.log_info("Ball spawned, AI paddle controller active - FIGHT!", "GAME")
 
 func _process(delta: float) -> void:
 	"""Update game systems"""
 	if game_state and game_state.current_phase == GameState.Phase.BATTLE:
 		if ball_physics:
 			ball_physics.update_physics(delta)
+		if paddle_ai:
+			paddle_ai.update_ai(delta)
 
 func _on_deployment_timer_update(time: float) -> void:
 	"""Update deployment timer"""
