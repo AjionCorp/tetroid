@@ -132,35 +132,35 @@ func _start_deployment() -> void:
 	game_hud.update_blocks_remaining(2, 5, 5)
 
 func _input(event: InputEvent) -> void:
-	"""Handle input for deployment phase"""
-	if game_state.current_phase != GameState.Phase.DEPLOYMENT:
-		return
-	
-	if not deployment_manager:
-		return
-	
-	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT:
+	"""Handle input"""
+	# DEPLOYMENT PHASE - piece movement
+	if game_state.current_phase == GameState.Phase.DEPLOYMENT:
+		if not deployment_manager:
+			return
+		
+		if event is InputEventMouseButton:
+			if event.button_index == MOUSE_BUTTON_LEFT:
+				if event.pressed:
+					deployment_manager.select_piece_at(event.position, board_manager)
+				else:
+					deployment_manager.deselect_piece()
+		
+		elif event is InputEventMouseMotion:
+			if deployment_manager.is_dragging:
+				deployment_manager.move_selected_piece(event.position, board_manager)
+		
+		elif event is InputEventKey:
 			if event.pressed:
-				# Mouse down - select piece
-				deployment_manager.select_piece_at(event.position, board_manager)
-			else:
-				# Mouse up - deselect
-				deployment_manager.deselect_piece()
+				if event.keycode == KEY_Q:
+					deployment_manager.rotate_selected_piece(board_manager, -1)
+				elif event.keycode == KEY_E:
+					deployment_manager.rotate_selected_piece(board_manager, 1)
 	
-	elif event is InputEventMouseMotion:
-		# Dragging - move selected piece
-		if deployment_manager.is_dragging:
-			deployment_manager.move_selected_piece(event.position, board_manager)
-	
-	elif event is InputEventKey:
-		if event.pressed:
-			if event.keycode == KEY_Q:
-				# Q key - rotate LEFT (counter-clockwise)
-				deployment_manager.rotate_selected_piece(board_manager, -1)
-			elif event.keycode == KEY_E:
-				# E key - rotate RIGHT (clockwise)
-				deployment_manager.rotate_selected_piece(board_manager, 1)
+	# BATTLE PHASE - ball launch
+	elif game_state.current_phase == GameState.Phase.BATTLE:
+		if event is InputEventMouseButton:
+			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+				_try_launch_attached_ball(event.position)
 
 
 func _on_phase_changed(new_phase: GameState.Phase) -> void:
@@ -177,23 +177,25 @@ func _start_battle() -> void:
 	var board_width = board_manager.board_width * board_manager.cell_size
 	var board_height = board_manager.board_height * board_manager.cell_size
 	
-	# Create PLAYER'S ball (starts AT player paddle)
+	# Create PLAYER'S ball (starts ATTACHED to player paddle)
 	player_ball = Ball.new()
 	player_ball.owner_id = 1
 	player_ball.initialize(
-		Vector2(player_paddle.position.x, player_paddle.position.y - 20),  # On player's paddle
-		Vector2(randf_range(-100, 100), -400)  # Going UP toward AI
+		Vector2(player_paddle.position.x, player_paddle.position.y - 20),
+		Vector2(0, -400)  # Initial velocity (won't be used until launched)
 	)
 	board_manager.add_child(player_ball)
+	player_ball.attach_to_paddle(player_paddle)  # Start attached
 	
-	# Create AI'S ball (starts AT AI paddle)
+	# Create AI'S ball (starts ATTACHED to AI paddle)
 	ai_ball = Ball.new()
 	ai_ball.owner_id = 2
 	ai_ball.initialize(
-		Vector2(ai_paddle.position.x, ai_paddle.position.y + 20),  # On AI's paddle
-		Vector2(randf_range(-100, 100), 400)  # Going DOWN toward player
+		Vector2(ai_paddle.position.x, ai_paddle.position.y + 20),
+		Vector2(0, 400)  # Initial velocity
 	)
 	board_manager.add_child(ai_ball)
+	ai_ball.attach_to_paddle(ai_paddle)  # Start attached
 	
 	# Initialize ball physics system
 	ball_physics = BallPhysics.new()
@@ -238,13 +240,52 @@ func _on_ball_missed(player_id: int) -> void:
 	game_state.damage_player(player_id, 10)
 
 func _on_match_ended(result: GameState.MatchResult) -> void:
-	"""Match ended"""
+	"""Match ended - show results screen"""
 	print("=== MATCH ENDED ===")
+	
+	var is_victory = false
 	match result:
 		GameState.MatchResult.PLAYER1_WIN:
 			print("YOU WIN!")
+			is_victory = true
 		GameState.MatchResult.PLAYER2_WIN:
 			print("AI WINS!")
+			is_victory = false
+		GameState.MatchResult.DRAW:
+			print("DRAW!")
+			is_victory = false
+	
+	# Show results screen
+	_show_results_screen(is_victory)
+
+func _show_results_screen(is_victory: bool) -> void:
+	"""Display match results screen"""
+	# Create results overlay (as CanvasLayer so it's on top)
+	var results_layer = CanvasLayer.new()
+	results_layer.layer = 200  # Above everything
+	add_child(results_layer)
+	
+	var results_screen = MatchResults.new()
+	results_screen.set_results(
+		is_victory,
+		game_state.player1_hp,
+		game_state.player2_hp,
+		game_state.player1_score,
+		game_state.player2_score
+	)
+	results_screen.leave_pressed.connect(_on_results_leave)
+	results_layer.add_child(results_screen)
+
+func _on_results_leave() -> void:
+	"""Player clicked leave on results screen"""
+	print("Leaving match, returning to main menu...")
+	
+	# Clean up game
+	queue_free()
+	
+	# Show main menu
+	var main_menu = MainMenu.new()
+	get_tree().root.add_child(main_menu)
 
 func _on_end_turn_pressed() -> void:
 	"""Player pressed End Turn button"""
@@ -252,6 +293,23 @@ func _on_end_turn_pressed() -> void:
 	if game_state and game_state.current_phase == GameState.Phase.DEPLOYMENT:
 		game_state.deployment_time = 0.0  # Force timer to expire
 		# This will trigger phase change in next frame
+
+func _try_launch_attached_ball(click_pos: Vector2) -> void:
+	"""Try to launch player's ball if it's attached"""
+	if not player_ball or not player_ball.is_attached:
+		return
+	
+	# Calculate launch angle from paddle to mouse
+	var paddle_pos = player_paddle.global_position
+	var direction_to_mouse = (click_pos - paddle_pos).normalized()
+	var angle = atan2(direction_to_mouse.y, direction_to_mouse.x)
+	
+	# Clamp angle to upward range (don't shoot downward)
+	# Allow -120° to -60° (upward cone)
+	angle = clamp(angle, -2.0 * PI / 3.0, -PI / 3.0)
+	
+	player_ball.launch_from_paddle(angle)
+	print("Launched ball at " + str(rad_to_deg(angle)) + "° toward mouse!")
 
 func _on_paddle_moved(direction: float, player_id: int) -> void:
 	"""Handle paddle movement - ONLY for human player"""
@@ -261,3 +319,7 @@ func _on_paddle_moved(direction: float, player_id: int) -> void:
 	# ONLY control player paddle (never AI paddle)
 	if player_id == 1 and player_paddle:
 		player_paddle.move_with_input(direction)
+		
+		# If ball is attached, move with paddle
+		if player_ball and player_ball.is_attached:
+			player_ball.attach_offset = 0  # Keep centered for now

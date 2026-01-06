@@ -211,7 +211,9 @@ func update_phase(phase_name: String) -> void:
 		phase_label.text = phase_name + " PHASE"
 		
 		if phase_name == "BATTLE":
-			phase_label.add_theme_color_override("font_color", Color.RED)
+			phase_label.text = "CLICK to Launch Ball | A/D to Move Paddle"
+			phase_label.add_theme_color_override("font_color", Color.CYAN)
+			phase_label.add_theme_font_size_override("font_size", 24)
 			if timer_label:
 				timer_label.hide()  # Hide timer in battle
 			if end_turn_button:

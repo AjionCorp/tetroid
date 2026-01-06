@@ -18,10 +18,14 @@ var trail: Line2D
 
 ## State
 var is_active: bool = true
+var is_attached: bool = false
+var attached_paddle = null
+var attach_offset: float = 0.0  # Offset from paddle center
 
 signal ball_hit_block(block)
 signal ball_hit_paddle(paddle, player_id: int)
 signal ball_missed(player_id: int)
+signal ball_attached_to_paddle(ball, paddle)
 
 func _ready() -> void:
 	# Visuals created after initialize() is called
@@ -59,9 +63,38 @@ func _create_visuals() -> void:
 	add_child(trail)
 
 func _process(_delta: float) -> void:
-	"""Update ball visuals"""
-	# Physics handled by BallPhysics system
+	"""Update ball visuals and attachment"""
+	# If attached to paddle, follow it
+	if is_attached and attached_paddle:
+		position.x = attached_paddle.position.x + attach_offset
+		position.y = attached_paddle.position.y - 20  # Above paddle
+		velocity = Vector2.ZERO  # No velocity while attached
+	
+	# Update trail
 	_update_trail()
+
+func attach_to_paddle(paddle) -> void:
+	"""Attach ball to paddle (waiting for launch)"""
+	is_attached = true
+	attached_paddle = paddle
+	attach_offset = 0.0  # Center of paddle
+	is_active = false  # Stop physics
+	print("Ball attached to P" + str(paddle.player_id) + " paddle - Click to launch!")
+	emit_signal("ball_attached_to_paddle", self, paddle)
+
+func launch_from_paddle(aim_angle: float) -> void:
+	"""Launch ball from paddle with given angle"""
+	if not is_attached:
+		return
+	
+	is_attached = false
+	attached_paddle = null
+	is_active = true
+	
+	# Launch with specified angle
+	velocity = Vector2(cos(aim_angle), sin(aim_angle)) * speed
+	
+	print("Ball launched at angle: " + str(rad_to_deg(aim_angle)) + "°")
 
 func _update_trail() -> void:
 	"""Update trail effect"""

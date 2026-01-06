@@ -29,6 +29,16 @@ func update_ai(delta: float) -> void:
 		print("WARNING: PaddleAI trying to control non-AI paddle!")
 		return
 	
+	# If ball is attached, launch it after a short delay
+	if ball.is_attached and ball.attached_paddle == paddle:
+		await get_tree().create_timer(0.5).timeout
+		if ball.is_attached:  # Still attached after delay
+			# Launch at random angle toward player
+			var angle = randf_range(-2.0 * PI / 3.0, -PI / 3.0) + PI  # Downward
+			ball.launch_from_paddle(angle)
+			print("AI launched ball!")
+		return
+	
 	# Simple AI: Move paddle toward ball's X position
 	var target_x = ball.position.x
 	

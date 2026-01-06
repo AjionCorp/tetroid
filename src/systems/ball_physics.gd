@@ -42,7 +42,14 @@ func update_physics(delta: float) -> void:
 	
 	# Update each ball
 	for ball in balls:
-		if not ball or not ball.is_active:
+		if not ball:
+			continue
+		
+		# Skip physics if ball is attached to paddle
+		if ball.is_attached:
+			continue
+		
+		if not ball.is_active:
 			continue
 		
 		# Move ball
@@ -166,30 +173,41 @@ func _calculate_bounce_normal(ball_pos: Vector2, block_pos: Vector2) -> Vector2:
 		return Vector2(0, sign(diff.y))
 
 func _check_out_of_bounds(ball) -> void:
-	"""Check if ball went out of bounds - only ENEMY ball causes damage"""
+	"""Check if ball went behind paddle - attach it for re-launch"""
 	var board_height = board_manager.board_height * board_manager.cell_size
 	
 	if ball.position.y < -20:
 		# Ball went off TOP
 		if ball.owner_id == 1:
-			# YOUR ball went past AI - AI takes damage
+			# YOUR ball scored against AI!
 			print("Your CYAN ball scored! AI takes damage!")
-			emit_signal("ball_missed", 2)  # AI (player 2) takes damage
+			emit_signal("ball_missed", 2)  # AI takes damage
+			# Attach to your paddle for relaunch
+			_attach_ball_to_owner_paddle(ball)
 		else:
-			# AI's ball went back off top - just respawn, no damage
-			print("AI's RED ball went off top - respawning")
-		_respawn_ball(ball)
+			# AI's ball went backwards - attach to AI paddle
+			print("AI's RED ball went backwards - attaching to AI paddle")
+			_attach_ball_to_owner_paddle(ball)
 		
 	elif ball.position.y > board_height + 20:
 		# Ball went off BOTTOM
 		if ball.owner_id == 2:
-			# ENEMY ball got past you - YOU take damage!
+			# ENEMY ball scored against you!
 			print("Enemy RED ball scored! You take damage!")
-			emit_signal("ball_missed", 1)  # You (player 1) take damage
+			emit_signal("ball_missed", 1)  # You take damage
+			# Attach to AI paddle for relaunch
+			_attach_ball_to_owner_paddle(ball)
 		else:
-			# YOUR ball went back off bottom - just respawn, no damage
-			print("Your CYAN ball went off bottom - respawning")
-		_respawn_ball(ball)
+			# YOUR ball went backwards - attach to your paddle
+			print("Your CYAN ball went backwards - attaching to paddle")
+			_attach_ball_to_owner_paddle(ball)
+
+func _attach_ball_to_owner_paddle(ball) -> void:
+	"""Attach ball to its owner's paddle"""
+	for paddle in paddles:
+		if paddle and paddle.player_id == ball.owner_id:
+			ball.attach_to_paddle(paddle)
+			break
 
 func _respawn_ball(ball) -> void:
 	"""Respawn ball in owner's territory"""
