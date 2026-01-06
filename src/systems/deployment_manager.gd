@@ -55,7 +55,13 @@ func create_starting_pieces(pid: int, board_manager) -> Array:
 	for i in range(pieces.size()):
 		var p = pieces[i]
 		print("  Piece " + str(i+1) + ": " + p.type + " at anchor " + str(p.anchor))
-		print("    Blocks at: " + str([b.grid_position for b in p.blocks if is_instance_valid(b)]))
+		
+		# Build position list manually (GDScript doesn't support list comprehension)
+		var positions = []
+		for b in p.blocks:
+			if is_instance_valid(b):
+				positions.append(b.grid_position)
+		print("    Blocks at: " + str(positions))
 	print("================")
 	
 	return pieces
