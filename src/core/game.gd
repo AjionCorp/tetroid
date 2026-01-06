@@ -255,15 +255,19 @@ func _on_match_ended(result: GameState.MatchResult) -> void:
 			print("DRAW!")
 			is_victory = false
 	
-	# Show results screen
+	# Wait a moment then show results
+	await get_tree().create_timer(1.0).timeout
 	_show_results_screen(is_victory)
 
 func _show_results_screen(is_victory: bool) -> void:
 	"""Display match results screen"""
+	print("Showing results screen...")
+	
 	# Create results overlay (as CanvasLayer so it's on top)
 	var results_layer = CanvasLayer.new()
+	results_layer.name = "ResultsLayer"
 	results_layer.layer = 200  # Above everything
-	add_child(results_layer)
+	get_tree().root.add_child(results_layer)  # Add to root for guaranteed visibility
 	
 	var results_screen = MatchResults.new()
 	results_screen.set_results(
@@ -275,10 +279,17 @@ func _show_results_screen(is_victory: bool) -> void:
 	)
 	results_screen.leave_pressed.connect(_on_results_leave)
 	results_layer.add_child(results_screen)
+	
+	print("Results screen created and added!")
 
 func _on_results_leave() -> void:
 	"""Player clicked leave on results screen"""
 	print("Leaving match, returning to main menu...")
+	
+	# Clean up results layer
+	var results_layer = get_tree().root.get_node_or_null("ResultsLayer")
+	if results_layer:
+		results_layer.queue_free()
 	
 	# Clean up game
 	queue_free()
@@ -286,6 +297,7 @@ func _on_results_leave() -> void:
 	# Show main menu
 	var main_menu = MainMenu.new()
 	get_tree().root.add_child(main_menu)
+	print("Returned to main menu")
 
 func _on_end_turn_pressed() -> void:
 	"""Player pressed End Turn button"""
