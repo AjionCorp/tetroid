@@ -20,8 +20,13 @@ func set_ball(b: Ball) -> void:
 	ball = b
 
 func update_ai(delta: float) -> void:
-	"""Update AI paddle control"""
+	"""Update AI paddle control - ONLY controls AI paddle"""
 	if not paddle or not ball:
+		return
+	
+	# ONLY control if this is the AI paddle (player_id == 2)
+	if paddle.player_id != 2:
+		print("WARNING: PaddleAI trying to control non-AI paddle!")
 		return
 	
 	# Simple AI: Move paddle toward ball's X position
