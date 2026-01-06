@@ -159,10 +159,10 @@ func _create_center_display() -> void:
 	
 	# Instructions
 	var instructions = Label.new()
-	instructions.text = "Rearrange your pieces!\nClick & Drag to Move | R to Rotate"
+	instructions.text = "5 Pieces Pre-Placed at Bottom\nCLICK piece → DRAG to move → R to rotate"
 	instructions.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	instructions.add_theme_color_override("font_color", Constants.COLOR_TEXT_SECONDARY)
-	instructions.add_theme_font_size_override("font_size", 16)
+	instructions.add_theme_color_override("font_color", Color.YELLOW)
+	instructions.add_theme_font_size_override("font_size", 18)
 	center.add_child(instructions)
 
 func update_timer(time: float) -> void:

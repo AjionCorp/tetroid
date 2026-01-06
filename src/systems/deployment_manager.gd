@@ -36,19 +36,28 @@ func create_starting_pieces(pid: int, board_manager) -> Array:
 	
 	print("Player " + str(pid) + " starting pieces: 2x " + type1 + ", 3x " + type2)
 	
-	# Pre-place them in player's territory
-	var territory_y_start = 35 if pid == 1 else 5  # Bottom for P1, top for P2
-	var spacing = 10
+	# Pre-place them clustered and visible in player's territory
+	var territory_y_start = 50 if pid == 1 else 10  # Bottom for P1, top for P2
+	var spacing = 6  # Tighter spacing
 	
 	for i in range(piece_types.size()):
 		var piece_type = piece_types[i]
-		var start_pos = Vector2i(5 + (i * spacing), territory_y_start)
+		var start_pos = Vector2i(10 + (i * spacing), territory_y_start)
 		
 		# Create piece group
 		var piece_group = _create_piece_group(piece_type, start_pos, pid, board_manager)
 		pieces.append(piece_group)
 	
 	deployed_pieces = pieces
+	
+	# Debug: Show where all pieces are
+	print("=== Deployed Pieces for Player " + str(pid) + " ===")
+	for i in range(pieces.size()):
+		var p = pieces[i]
+		print("  Piece " + str(i+1) + ": " + p.type + " at anchor " + str(p.anchor))
+		print("    Blocks at: " + str([b.grid_position for b in p.blocks if is_instance_valid(b)]))
+	print("================")
+	
 	return pieces
 
 func _create_piece_group(piece_type: String, grid_pos: Vector2i, owner: int, board_manager) -> Dictionary:
@@ -137,9 +146,12 @@ func move_selected_piece(new_pos: Vector2, board_manager) -> void:
 func rotate_selected_piece(board_manager) -> void:
 	"""Rotate the selected piece 90 degrees"""
 	if not selected_piece:
+		print("No piece selected to rotate!")
 		return
 	
 	var new_rotation = (selected_piece.rotation + 1) % 4
+	
+	print("Rotating " + selected_piece.type + " from " + str(selected_piece.rotation) + " to " + str(new_rotation))
 	
 	# Calculate new positions with rotation
 	var new_positions = BlockFactory.calculate_piece_positions(
@@ -148,15 +160,18 @@ func rotate_selected_piece(board_manager) -> void:
 		new_rotation
 	)
 	
+	print("New positions after rotation: " + str(new_positions))
+	
 	# Validate
 	var all_valid = true
 	for pos in new_positions:
 		if not board_manager.is_position_valid(pos):
 			all_valid = false
+			print("Invalid position: " + str(pos))
 			break
 	
 	if not all_valid:
-		print("Cannot rotate there!")
+		print("Cannot rotate there! Would go out of bounds or hit neutral zone")
 		return
 	
 	# Update blocks
@@ -168,7 +183,7 @@ func rotate_selected_piece(board_manager) -> void:
 			block.piece_rotation = new_rotation
 	
 	selected_piece.rotation = new_rotation
-	print("Rotated " + selected_piece.type + " to " + str(new_rotation * 90) + " degrees")
+	print("✓ Rotated " + selected_piece.type + " to " + str(new_rotation * 90) + "°")
 
 func deselect_piece() -> void:
 	"""Deselect current piece"""
@@ -182,6 +197,8 @@ func _highlight_piece(piece_group: Dictionary, highlight: bool) -> void:
 	for block in piece_group.blocks:
 		if is_instance_valid(block) and block.sprite:
 			if highlight:
-				block.sprite.modulate = Color(1.5, 1.5, 1.5)  # Brighter
+				block.sprite.modulate = Color(2.0, 2.0, 2.0)  # Much brighter
+				block.sprite.scale = Vector2(1.2, 1.2)  # Slightly larger
 			else:
 				block.sprite.modulate = Color.WHITE
+				block.sprite.scale = Vector2(1.0, 1.0)
