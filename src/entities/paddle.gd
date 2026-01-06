@@ -51,15 +51,10 @@ func _create_visuals() -> void:
 func _physics_process(delta: float) -> void:
 	"""Update paddle physics"""
 	if abs(velocity) > 0.01:
-		var old_x = position.x
 		position.x += velocity * delta
 		
 		# Clamp to bounds
 		position.x = clamp(position.x, min_x, max_x)
-		
-		# Debug only when actually moving
-		if abs(position.x - old_x) > 0.1:
-			print("P" + str(player_id) + " paddle moved from " + str(int(old_x)) + " to " + str(int(position.x)))
 
 func set_target_x(target_x: float) -> void:
 	"""Set target X position (for AI or mouse control)"""
@@ -69,7 +64,6 @@ func set_target_x(target_x: float) -> void:
 func move_with_input(input_direction: float) -> void:
 	"""Move paddle with keyboard/controller input"""
 	velocity = input_direction * paddle_speed
-	print("Paddle " + str(player_id) + " velocity set to: " + str(velocity) + " (input=" + str(input_direction) + ")")
 
 func check_ball_collision(ball_position: Vector2, ball_radius: float) -> bool:
 	"""Check if ball collides with paddle"""

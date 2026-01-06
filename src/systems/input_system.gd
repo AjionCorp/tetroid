@@ -48,8 +48,11 @@ func _process_player_input(player_id: int) -> void:
 	
 	# Movement (analog - gets value)
 	var move_input: float = get_move_input(player_id)
+	
+	# ALWAYS emit (even if 0) so paddle stops when keys released
+	paddle_moved.emit(move_input, player_id)
+	
 	if abs(move_input) > DEADZONE:
-		paddle_moved.emit(move_input, player_id)
 		print("Paddle move input: " + str(move_input) + " for player " + str(player_id))
 	
 	# Actions (digital - pressed this frame)
@@ -74,23 +77,19 @@ func get_move_input(player_id: int) -> float:
 	var left_action: String = actions.get("left", "")
 	var right_action: String = actions.get("right", "")
 	
-	# RAW key detection (bypass InputMap)
+	# RAW key detection (bypass InputMap for reliability)
 	if Input.is_physical_key_pressed(KEY_A):
 		input -= 1.0
-		print("RAW: A key detected!")
 	
 	if Input.is_physical_key_pressed(KEY_D):
 		input += 1.0
-		print("RAW: D key detected!")
 	
-	# Also try arrow keys
+	# Also support arrow keys
 	if Input.is_physical_key_pressed(KEY_LEFT):
 		input -= 1.0
-		print("RAW: LEFT arrow detected!")
 	
 	if Input.is_physical_key_pressed(KEY_RIGHT):
 		input += 1.0
-		print("RAW: RIGHT arrow detected!")
 	
 	# Controller support (if connected)
 	# Godot automatically maps controller axes

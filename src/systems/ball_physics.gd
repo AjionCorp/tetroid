@@ -66,7 +66,7 @@ func _check_wall_collision(ball) -> void:
 		ball.velocity.x = -abs(ball.velocity.x)
 
 func _check_paddle_collision(ball) -> void:
-	"""Check collision with paddles - only with OWNER's paddle"""
+	"""Check collision with paddles - can deflect ANY ball!"""
 	# Skip if in cooldown for this ball
 	if paddle_collision_cooldowns.get(ball, 0) > 0:
 		return
@@ -75,9 +75,8 @@ func _check_paddle_collision(ball) -> void:
 		if not paddle:
 			continue
 		
-		# Ball only bounces off its OWNER's paddle
-		if ball.owner_id != paddle.player_id:
-			continue
+		# Paddle can deflect BOTH balls (yours AND enemy's)
+		# This is key to strategy - defend against enemy ball!
 		
 		# Check collision
 		var paddle_rect = Rect2(

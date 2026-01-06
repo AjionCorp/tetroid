@@ -261,4 +261,3 @@ func _on_paddle_moved(direction: float, player_id: int) -> void:
 	# ONLY control player paddle (never AI paddle)
 	if player_id == 1 and player_paddle:
 		player_paddle.move_with_input(direction)
-		print("→ Player paddle moving: " + str(direction) + " | Velocity: " + str(player_paddle.velocity))
