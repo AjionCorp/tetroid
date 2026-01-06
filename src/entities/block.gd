@@ -52,7 +52,8 @@ func initialize(config: Dictionary, grid_pos: Vector2i, owner: int) -> void:
 	grid_position = grid_pos
 	owner_id = owner
 	
-	# Set visual position
+	# Set visual position based on grid (will be overridden if moved)
+	# Position is relative to parent (BoardManager)
 	position = Vector2(
 		grid_pos.x * Constants.CELL_SIZE,
 		grid_pos.y * Constants.CELL_SIZE

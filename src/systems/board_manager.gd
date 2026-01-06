@@ -158,6 +158,11 @@ func _draw_territory_borders() -> void:
 func add_block(block: Block) -> void:
 	"""Add a block to the board"""
 	if blocks_container:
+		# Set block's visual position based on its grid position and current cell size
+		block.position = Vector2(
+			block.grid_position.x * cell_size,
+			block.grid_position.y * cell_size
+		)
 		blocks_container.add_child(block)
 
 func get_blocks() -> Array:
