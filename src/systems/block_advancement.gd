@@ -8,7 +8,8 @@ var board_manager
 var game_state
 
 var advancement_timer: float = 0.0
-const ADVANCEMENT_INTERVAL: float = 6.0  # Advance every 6 seconds
+const ADVANCEMENT_INTERVAL: float = 3.0  # Advance every 3 seconds
+const ANIMATION_DURATION: float = 0.5  # Smooth movement duration
 
 signal blocks_scored(player_id: int, damage: int)
 
@@ -69,11 +70,19 @@ func _advance_all_blocks() -> void:
 		if _check_scoring_zone(block, new_y):
 			continue  # Block scored, don't move it
 		
-		# Move block
+		# Move block SMOOTHLY with animation
+		var old_position = block.position
 		block.grid_position.y = new_y
-		block.position = board_manager.grid_to_screen(block.grid_position)
+		var new_position = board_manager.grid_to_screen(block.grid_position)
 		
-		print("Block owner=" + str(block.owner_id) + " advanced to row " + str(new_y))
+		# Animate the movement
+		var tween = block.create_tween()
+		tween.set_ease(Tween.EASE_IN_OUT)
+		tween.set_trans(Tween.TRANS_CUBIC)
+		block.position = old_position  # Reset to old position
+		tween.tween_property(block, "position", new_position, ANIMATION_DURATION)
+		
+		print("Block owner=" + str(block.owner_id) + " advancing to row " + str(new_y))
 
 func _check_scoring_zone(block: Block, new_y: int) -> bool:
 	"""Check if block reached scoring zone"""

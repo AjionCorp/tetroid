@@ -112,6 +112,9 @@ func launch_from_paddle(aim_angle: float) -> void:
 	
 	var launching_paddle_id = attached_paddle.player_id if attached_paddle else 0
 	
+	# Set last_hit_by to whoever launched it
+	last_hit_by = launching_paddle_id
+	
 	is_attached = false
 	attached_paddle = null
 	is_active = true
@@ -119,7 +122,7 @@ func launch_from_paddle(aim_angle: float) -> void:
 	# Launch with specified angle
 	velocity = Vector2(cos(aim_angle), sin(aim_angle)) * speed
 	
-	print("Ball (owner=" + str(owner_id) + ") launched from P" + str(launching_paddle_id) + " paddle at angle: " + str(rad_to_deg(aim_angle)) + "° | Velocity: " + str(velocity))
+	print("Ball (owner=" + str(owner_id) + ", last_hit=" + str(last_hit_by) + ") launched from P" + str(launching_paddle_id) + " at " + str(rad_to_deg(aim_angle)) + "°")
 
 func _update_trail() -> void:
 	"""Update trail effect"""
