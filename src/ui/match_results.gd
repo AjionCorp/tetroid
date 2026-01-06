@@ -34,16 +34,13 @@ func _create_results_ui() -> void:
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(overlay)
 	
-	# Center container
+	# Center container (properly centered)
 	var center = VBoxContainer.new()
-	center.anchor_left = 0.5
-	center.anchor_top = 0.5
-	center.anchor_right = 0.5
-	center.anchor_bottom = 0.5
-	center.offset_left = -300
-	center.offset_top = -250
-	center.offset_right = 300
-	center.offset_bottom = 250
+	center.set_anchors_preset(Control.PRESET_CENTER)
+	center.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	center.grow_vertical = Control.GROW_DIRECTION_BOTH
+	center.position = Vector2(-300, -300)  # Offset from center
+	center.custom_minimum_size = Vector2(600, 600)
 	center.add_theme_constant_override("separation", 30)
 	add_child(center)
 	
