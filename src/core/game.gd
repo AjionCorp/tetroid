@@ -2,7 +2,7 @@
 ##
 ## Orchestrates all game systems in a modular way
 class_name Game
-extends CanvasLayer
+extends Node2D
 
 ## Core systems
 var game_state: GameState
@@ -60,8 +60,9 @@ func _initialize_game_state() -> void:
 func _initialize_board() -> void:
 	"""Initialize board manager"""
 	board_manager = BoardManager.new()
+	board_manager.name = "BoardManager"
 	add_child(board_manager)
-	print("✓ Board created (60x62)")
+	print("✓ Board created (60x62, full screen)")
 
 func _initialize_input() -> void:
 	"""Initialize input system"""
@@ -72,24 +73,29 @@ func _initialize_input() -> void:
 	print("✓ Input system ready")
 
 func _initialize_hud() -> void:
-	"""Initialize game HUD"""
+	"""Initialize game HUD as overlay"""
+	var hud_layer = CanvasLayer.new()
+	hud_layer.name = "HUDLayer"
+	hud_layer.layer = 100  # On top
+	add_child(hud_layer)
+	
 	game_hud = GameHUD.new()
-	add_child(game_hud)
-	print("✓ HUD initialized")
+	hud_layer.add_child(game_hud)
+	print("✓ HUD initialized (overlay)")
 
 func _initialize_players() -> void:
 	"""Initialize player paddles"""
-	# Human player paddle (BOTTOM)
+	# Human player paddle (BOTTOM - just below neutral zone)
 	player_paddle = Paddle.new()
-	player_paddle.initialize(1, 57 * board_manager.cell_size)
+	player_paddle.initialize(1, 34 * board_manager.cell_size)  # Just below neutral zone (row 32-33 area)
 	board_manager.add_child(player_paddle)
 	
-	# AI paddle (TOP)
+	# AI paddle (TOP - just above neutral zone)
 	ai_paddle = Paddle.new()
-	ai_paddle.initialize(2, 5 * board_manager.cell_size)
+	ai_paddle.initialize(2, 28 * board_manager.cell_size)  # Just above neutral zone (row 28-29 area)
 	board_manager.add_child(ai_paddle)
 	
-	print("✓ Paddles created (Human=bottom, AI=top)")
+	print("✓ Paddles created near neutral zone")
 
 func _start_deployment() -> void:
 	"""Start deployment phase"""
