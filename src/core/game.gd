@@ -206,13 +206,14 @@ func _start_battle() -> void:
 	ball_physics.ball_missed.connect(_on_ball_missed)
 	add_child(ball_physics)
 	
-	# Initialize AI paddle controller (tracks AI's own ball)
+	# Initialize AI paddle controller (tracks BOTH balls strategically)
 	paddle_ai = PaddleAI.new()
 	paddle_ai.set_paddle(ai_paddle)
-	paddle_ai.set_ball(ai_ball)  # AI tracks its own ball
+	paddle_ai.set_ball(ai_ball)  # AI's own ball
+	paddle_ai.set_enemy_ball(player_ball)  # Player's ball to defend against
 	add_child(paddle_ai)
 	
-	DebugLogger.log_info("TWO balls spawned - Each player has their own ball!", "GAME")
+	DebugLogger.log_info("TWO balls spawned - AI now tracks both balls!", "GAME")
 
 func _process(delta: float) -> void:
 	"""Update game systems"""
@@ -263,13 +264,9 @@ func _show_results_screen(is_victory: bool) -> void:
 	"""Display match results screen"""
 	print("Showing results screen...")
 	
-	# Create results overlay (as CanvasLayer so it's on top)
-	var results_layer = CanvasLayer.new()
-	results_layer.name = "ResultsLayer"
-	results_layer.layer = 200  # Above everything
-	get_tree().root.add_child(results_layer)  # Add to root for guaranteed visibility
-	
+	# Create results screen (now extends CanvasLayer itself)
 	var results_screen = MatchResults.new()
+	results_screen.name = "ResultsScreen"
 	results_screen.set_results(
 		is_victory,
 		game_state.player1_hp,
@@ -278,26 +275,30 @@ func _show_results_screen(is_victory: bool) -> void:
 		game_state.player2_score
 	)
 	results_screen.leave_pressed.connect(_on_results_leave)
-	results_layer.add_child(results_screen)
 	
-	print("Results screen created and added!")
+	# Add directly to root
+	get_tree().root.add_child(results_screen)
+	
+	print("Results screen created and added to root!")
 
 func _on_results_leave() -> void:
 	"""Player clicked leave on results screen"""
 	print("Leaving match, returning to main menu...")
 	
-	# Clean up results layer
-	var results_layer = get_tree().root.get_node_or_null("ResultsLayer")
-	if results_layer:
-		results_layer.queue_free()
+	# Clean up results screen
+	var results_screen = get_tree().root.get_node_or_null("ResultsScreen")
+	if results_screen:
+		results_screen.queue_free()
+		print("Results screen removed")
 	
 	# Clean up game
 	queue_free()
+	print("Game cleaned up")
 	
 	# Show main menu
 	var main_menu = MainMenu.new()
 	get_tree().root.add_child(main_menu)
-	print("Returned to main menu")
+	print("Main menu shown")
 
 func _on_end_turn_pressed() -> void:
 	"""Player pressed End Turn button"""

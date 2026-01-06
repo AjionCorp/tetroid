@@ -112,23 +112,26 @@ func bounce(normal: Vector2) -> void:
 	# Normalize and maintain speed
 	velocity = velocity.normalized() * speed
 
-func hit_by_paddle(paddle_velocity: float, hit_position: float) -> void:
+func hit_by_paddle(paddle_velocity: float, hit_position: float, paddle_player_id: int) -> void:
 	"""Ball hit by paddle"""
-	# Reflect upward/downward
-	velocity.y = -velocity.y
+	# Reflect in the correct direction based on which paddle
+	if paddle_player_id == 1:
+		# Bottom paddle - send ball UPWARD
+		velocity.y = -abs(velocity.y)
+	else:
+		# Top paddle - send ball DOWNWARD
+		velocity.y = abs(velocity.y)
 	
-	# Add paddle influence
+	# Add paddle movement influence
 	velocity.x += paddle_velocity * 0.3
 	
 	# Vary angle based on hit position (center vs edges)
-	var paddle_width = 60.0  # TODO: Get from paddle
-	var hit_offset = hit_position / (paddle_width / 2)  # -1 to 1
-	velocity.x += hit_offset * 100
+	velocity.x += hit_position * 150  # More influence from edges
 	
 	# Normalize and maintain speed
 	velocity = velocity.normalized() * speed
 	
-	# Small speed boost
+	# Small speed boost on each hit
 	speed = min(speed + 20, Constants.BALL_SPEED_MAX)
 	velocity = velocity.normalized() * speed
 

@@ -101,12 +101,16 @@ func _check_paddle_collision(ball) -> void:
 		)
 		
 		if paddle_rect.intersects(ball_rect):
-			# Ball hit own paddle!
+			# Ball hit paddle!
 			var hit_pos = (ball.position.x - paddle.position.x) / (paddle.paddle_width / 2.0)
-			ball.hit_by_paddle(paddle.velocity, hit_pos)
+			ball.hit_by_paddle(paddle.velocity, hit_pos, paddle.player_id)
 			paddle_collision_cooldowns[ball] = PADDLE_COOLDOWN_TIME
 			emit_signal("ball_hit_paddle", ball, paddle)
-			print("P" + str(paddle.player_id) + " deflected their ball!")
+			
+			if ball.owner_id == paddle.player_id:
+				print("P" + str(paddle.player_id) + " deflected their own ball!")
+			else:
+				print("P" + str(paddle.player_id) + " deflected ENEMY ball!")
 			return
 
 func _check_block_collision(ball) -> void:
@@ -210,22 +214,10 @@ func _attach_ball_to_owner_paddle(ball) -> void:
 			break
 
 func _respawn_ball(ball) -> void:
-	"""Respawn ball in owner's territory"""
-	var board_width = board_manager.board_width * board_manager.cell_size
-	var board_height = board_manager.board_height * board_manager.cell_size
-	
-	# Respawn in owner's area
-	if ball.owner_id == 1:
-		# Player 1 - bottom area
-		ball.position = Vector2(board_width / 2.0, board_height * 0.75)
-		# Send toward enemy (up)
-		var angle = randf_range(-PI/4, PI/4) - PI/2  # Upward
-		ball.velocity = Vector2(cos(angle), sin(angle)) * ball.speed
-	else:
-		# Player 2 - top area  
-		ball.position = Vector2(board_width / 2.0, board_height * 0.25)
-		# Send toward enemy (down)
-		var angle = randf_range(-PI/4, PI/4) + PI/2  # Downward
-		ball.velocity = Vector2(cos(angle), sin(angle)) * ball.speed
-	
-	print("P" + str(ball.owner_id) + "'s ball respawned")
+	"""Attach ball to owner's paddle for relaunch"""
+	# Find owner's paddle
+	for paddle in paddles:
+		if paddle and paddle.player_id == ball.owner_id:
+			ball.attach_to_paddle(paddle)
+			print("P" + str(ball.owner_id) + "'s ball attached to paddle for relaunch")
+			break
