@@ -5,20 +5,20 @@ class_name Game
 extends Node2D
 
 ## Core systems
-var game_state: GameState
-var board_manager: BoardManager
-var ball_physics: BallPhysics
-var input_system: InputSystem
-var deployment_ai: DeploymentAI
-var paddle_ai: PaddleAI
+var game_state
+var board_manager
+var ball_physics
+var input_system
+var deployment_ai
+var paddle_ai
 
 ## UI
-var game_hud: GameHUD
+var game_hud
 
 ## Entities
-var ball: Ball
-var player_paddle: Paddle  # Bottom paddle (human)
-var ai_paddle: Paddle      # Top paddle (AI)
+var ball
+var player_paddle  # Bottom paddle (human)
+var ai_paddle      # Top paddle (AI)
 
 ## Player data
 var player_pieces: Array = []
