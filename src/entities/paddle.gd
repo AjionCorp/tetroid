@@ -7,7 +7,7 @@ extends Node2D
 ## Paddle properties
 var player_id: int = 1
 var paddle_width: float = 60.0
-var paddle_speed: float = 691.2  # Increased by 20% again (576 * 1.2 = 691.2)
+var paddle_speed: float = 800.0  # Very fast to keep up with accelerating ball
 var velocity: float = 0.0
 
 ## Visual

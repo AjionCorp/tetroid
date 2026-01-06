@@ -134,7 +134,24 @@ func bounce(normal: Vector2) -> void:
 	velocity = velocity.normalized() * speed
 
 func hit_by_paddle(paddle_velocity: float, hit_position: float, paddle_player_id: int) -> void:
-	"""Ball hit by paddle"""
+	"""Ball hit by paddle - ownership transfers to paddle owner!"""
+	# CRITICAL: Ball ownership changes to whoever hit it!
+	var old_owner = owner_id
+	owner_id = paddle_player_id
+	
+	if old_owner != owner_id:
+		print("Ball ownership changed: P" + str(old_owner) + " → P" + str(owner_id))
+		# Update ball color to match new owner
+		if sprite:
+			if owner_id == 1:
+				sprite.modulate = Color.CYAN  # Player's ball
+				if trail:
+					trail.default_color = Color(0, 1, 1, 0.6)
+			else:
+				sprite.modulate = Color.RED  # AI's ball
+				if trail:
+					trail.default_color = Color(1, 0, 0, 0.6)
+	
 	# Reflect in the correct direction based on which paddle
 	if paddle_player_id == 1:
 		# Bottom paddle - send ball UPWARD
@@ -147,7 +164,7 @@ func hit_by_paddle(paddle_velocity: float, hit_position: float, paddle_player_id
 	velocity.x += paddle_velocity * 0.3
 	
 	# Vary angle based on hit position (center vs edges)
-	velocity.x += hit_position * 150  # More influence from edges
+	velocity.x += hit_position * 150
 	
 	# Normalize and maintain speed
 	velocity = velocity.normalized() * speed
