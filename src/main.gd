@@ -15,6 +15,10 @@ func _ready() -> void:
 	print("Code-Driven Development Mode")
 	print("Engine: Godot " + Engine.get_version_info().string)
 	
+	# Clear previous debug log
+	DebugLogger.clear_log()
+	DebugLogger.print_log_location()
+	
 	# Initialize core systems
 	_initialize_systems()
 	

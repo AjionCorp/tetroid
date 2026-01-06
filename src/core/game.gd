@@ -29,7 +29,7 @@ func _ready() -> void:
 
 func start() -> void:
 	"""Start a new game match"""
-	print("=== Starting New Match ===")
+	DebugLogger.log_info("=== Starting New Match ===", "GAME")
 	
 	# Initialize systems in order
 	_initialize_game_state()
@@ -41,7 +41,8 @@ func start() -> void:
 	# Start deployment phase
 	_start_deployment()
 	
-	print("=== Match Started ===")
+	DebugLogger.log_info("=== Match Started ===", "GAME")
+	DebugLogger.log_info("Click on board to place Tetris pieces!", "GAME")
 
 func _initialize_game_state() -> void:
 	"""Initialize game state manager"""
