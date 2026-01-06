@@ -167,19 +167,30 @@ func _calculate_bounce_normal(ball_pos: Vector2, block_pos: Vector2) -> Vector2:
 		return Vector2(0, sign(diff.y))
 
 func _check_out_of_bounds(ball) -> void:
-	"""Check if ball went out of bounds"""
+	"""Check if ball went out of bounds - only ENEMY ball causes damage"""
 	var board_height = board_manager.board_height * board_manager.cell_size
 	
 	if ball.position.y < -20:
-		# Went off top - Player 2 (AI) missed THEIR OWN ball
-		if ball.owner_id == 2:
-			emit_signal("ball_missed", 2)
-			_respawn_ball(ball)
-	elif ball.position.y > board_height + 20:
-		# Went off bottom - Player 1 (human) missed THEIR OWN ball
+		# Ball went off TOP
 		if ball.owner_id == 1:
-			emit_signal("ball_missed", 1)
-			_respawn_ball(ball)
+			# YOUR ball went past AI - AI takes damage
+			print("Your CYAN ball scored! AI takes damage!")
+			emit_signal("ball_missed", 2)  # AI (player 2) takes damage
+		else:
+			# AI's ball went back off top - just respawn, no damage
+			print("AI's RED ball went off top - respawning")
+		_respawn_ball(ball)
+		
+	elif ball.position.y > board_height + 20:
+		# Ball went off BOTTOM
+		if ball.owner_id == 2:
+			# ENEMY ball got past you - YOU take damage!
+			print("Enemy RED ball scored! You take damage!")
+			emit_signal("ball_missed", 1)  # You (player 1) take damage
+		else:
+			# YOUR ball went back off bottom - just respawn, no damage
+			print("Your CYAN ball went off bottom - respawning")
+		_respawn_ball(ball)
 
 func _respawn_ball(ball) -> void:
 	"""Respawn ball in owner's territory"""

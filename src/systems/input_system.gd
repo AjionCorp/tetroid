@@ -74,14 +74,23 @@ func get_move_input(player_id: int) -> float:
 	var left_action: String = actions.get("left", "")
 	var right_action: String = actions.get("right", "")
 	
-	# Check if actions exist in InputMap before using them
-	if not left_action.is_empty() and InputMap.has_action(left_action):
-		if Input.is_action_pressed(left_action):
-			input -= 1.0
+	# RAW key detection (bypass InputMap)
+	if Input.is_physical_key_pressed(KEY_A):
+		input -= 1.0
+		print("RAW: A key detected!")
 	
-	if not right_action.is_empty() and InputMap.has_action(right_action):
-		if Input.is_action_pressed(right_action):
-			input += 1.0
+	if Input.is_physical_key_pressed(KEY_D):
+		input += 1.0
+		print("RAW: D key detected!")
+	
+	# Also try arrow keys
+	if Input.is_physical_key_pressed(KEY_LEFT):
+		input -= 1.0
+		print("RAW: LEFT arrow detected!")
+	
+	if Input.is_physical_key_pressed(KEY_RIGHT):
+		input += 1.0
+		print("RAW: RIGHT arrow detected!")
 	
 	# Controller support (if connected)
 	# Godot automatically maps controller axes
