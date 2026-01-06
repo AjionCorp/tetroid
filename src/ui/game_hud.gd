@@ -130,12 +130,9 @@ func _create_stat_panel(pos: Vector2, title: String, color: Color) -> PanelConta
 func _create_center_display() -> void:
 	"""Create center timer/phase display"""
 	var center = VBoxContainer.new()
-	center.anchor_left = 0.5
-	center.anchor_right = 0.5
-	center.offset_left = -150
-	center.offset_right = 150
+	center.set_anchors_preset(Control.PRESET_CENTER_TOP)
 	center.offset_top = 20
-	center.offset_bottom = 120
+	center.custom_minimum_size = Vector2(300, 150)
 	center.alignment = BoxContainer.ALIGNMENT_CENTER
 	add_child(center)
 	

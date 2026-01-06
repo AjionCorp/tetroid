@@ -40,14 +40,14 @@ func _place_next_block() -> void:
 	
 	var piece_type = blocks_to_place[current_block_index]
 	
-	# Simple AI: Place randomly in own territory
-	# AI is Player 2 at TOP (y: 0-29)
-	var x = randi() % (Constants.BOARD_WIDTH - 4) + 2  # Leave some margin
-	var y = randi() % 25 + 2  # In top territory (avoid edges)
+	# AI places in TOP territory (rows 0-29)
+	# Use safe bounds within the board
+	var x = randi() % 56 + 2  # x: 2-57 (safe within 60 width)
+	var y = randi() % 26 + 2  # y: 2-27 (safe within top 30 rows, avoid row 30 neutral)
 	
 	var pos = Vector2i(x, y)
 	
-	print("AI placing " + piece_type + " at " + str(pos))
+	print("AI placing " + piece_type + " at grid " + str(pos))
 	emit_signal("ai_place_block", piece_type, pos)
 	
 	current_block_index += 1

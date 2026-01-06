@@ -22,17 +22,17 @@ signal ball_deflected()
 func _ready() -> void:
 	_create_visuals()
 
-func initialize(pid: int, y_position: float) -> void:
+func initialize(pid: int, y_position: float, board_width_px: float = 960.0) -> void:
 	"""Initialize paddle"""
 	player_id = pid
 	position.y = y_position
 	
-	# Set bounds
+	# Set bounds based on actual board size
 	min_x = paddle_width / 2
-	max_x = (Constants.BOARD_WIDTH * Constants.CELL_SIZE) - (paddle_width / 2)
+	max_x = board_width_px - (paddle_width / 2)
 	
 	# Start at center
-	position.x = (Constants.BOARD_WIDTH * Constants.CELL_SIZE) / 2
+	position.x = board_width_px / 2
 
 func _create_visuals() -> void:
 	"""Create paddle visuals"""

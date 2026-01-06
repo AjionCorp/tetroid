@@ -85,17 +85,19 @@ func _initialize_hud() -> void:
 
 func _initialize_players() -> void:
 	"""Initialize player paddles"""
+	var board_width_px = board_manager.board_width * board_manager.cell_size
+	
 	# Human player paddle (BOTTOM - just below neutral zone)
 	player_paddle = Paddle.new()
-	player_paddle.initialize(1, 34 * board_manager.cell_size)  # Just below neutral zone (row 32-33 area)
+	player_paddle.initialize(1, 34 * board_manager.cell_size, board_width_px)
 	board_manager.add_child(player_paddle)
 	
 	# AI paddle (TOP - just above neutral zone)
 	ai_paddle = Paddle.new()
-	ai_paddle.initialize(2, 28 * board_manager.cell_size)  # Just above neutral zone (row 28-29 area)
+	ai_paddle.initialize(2, 28 * board_manager.cell_size, board_width_px)
 	board_manager.add_child(ai_paddle)
 	
-	print("✓ Paddles created near neutral zone")
+	print("✓ Paddles created (width: " + str(board_width_px) + "px)")
 
 func _start_deployment() -> void:
 	"""Start deployment phase"""
