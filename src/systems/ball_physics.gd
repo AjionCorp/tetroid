@@ -130,6 +130,10 @@ func _check_block_collision(ball) -> void:
 		if not is_instance_valid(block) or block.is_destroyed:
 			continue
 		
+		# Skip PHASED blocks (scored blocks in ghost mode - no collision)
+		if block.has_meta("phased") and block.get_meta("phased"):
+			continue
+		
 		# OWNERSHIP CHECK:
 		# - Your ball PASSES THROUGH your own blocks (owner_id same)
 		# - Your ball BOUNCES OFF enemy blocks (owner_id different) and damages them

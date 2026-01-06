@@ -67,17 +67,25 @@ func _determine_territory() -> void:
 	if Constants.is_in_neutral_zone(grid_position.y):
 		territory = Territory.NEUTRAL
 	elif owner_id == 1:
-		# Player 1 (human) owns BOTTOM territory
+		# Player 1 (human) owns BOTTOM territory (rows 32-61)
 		if Constants.is_in_player2_territory(grid_position.y):
 			territory = Territory.FRIENDLY
 		else:
 			territory = Territory.ENEMY
+			# Forward-placed blocks (in enemy territory) are tougher!
+			hp *= 2  # Double HP for offensive placement
+			max_hp = hp
+			print("Block in ENEMY territory - HP doubled to " + str(hp))
 	else:
-		# Player 2 (AI) owns TOP territory
+		# Player 2 (AI) owns TOP territory (rows 0-29)
 		if Constants.is_in_player1_territory(grid_position.y):
 			territory = Territory.FRIENDLY
 		else:
 			territory = Territory.ENEMY
+			# Forward-placed blocks (in enemy territory) are tougher!
+			hp *= 2  # Double HP for offensive placement
+			max_hp = hp
+			print("Block in ENEMY territory - HP doubled to " + str(hp))
 
 func _process(delta: float) -> void:
 	"""Update block state"""

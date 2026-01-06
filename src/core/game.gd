@@ -12,6 +12,7 @@ var input_system
 var deployment_ai
 var paddle_ai
 var deployment_manager  # Handles piece movement/rotation
+var block_advancement    # Handles block pushing toward enemy
 
 ## UI
 var game_hud
@@ -213,7 +214,14 @@ func _start_battle() -> void:
 	paddle_ai.set_enemy_ball(player_ball)  # Player's ball to defend against
 	add_child(paddle_ai)
 	
-	DebugLogger.log_info("TWO balls spawned - AI now tracks both balls!", "GAME")
+	# Initialize block advancement system (territory push)
+	block_advancement = BlockAdvancement.new()
+	block_advancement.set_board_manager(board_manager)
+	block_advancement.set_game_state(game_state)
+	block_advancement.blocks_scored.connect(_on_blocks_scored)
+	add_child(block_advancement)
+	
+	DebugLogger.log_info("Battle systems active - Blocks will advance every 6 seconds!", "GAME")
 
 func _process(delta: float) -> void:
 	"""Update game systems"""
@@ -222,6 +230,8 @@ func _process(delta: float) -> void:
 			ball_physics.update_physics(delta)
 		if paddle_ai:
 			paddle_ai.update_ai(delta)
+		if block_advancement:
+			block_advancement.update_advancement(delta)
 
 func _on_deployment_timer_update(time: float) -> void:
 	"""Update deployment timer"""
@@ -239,6 +249,11 @@ func _on_ball_missed(player_id: int) -> void:
 	"""Ball missed by player"""
 	print("Player " + str(player_id) + " missed!")
 	game_state.damage_player(player_id, 10)
+
+func _on_blocks_scored(player_id: int, damage: int) -> void:
+	"""Connected blocks reached enemy zone"""
+	print("P" + str(player_id) + " takes " + str(damage) + " damage from block advancement!")
+	game_state.damage_player(player_id, damage)
 
 func _on_match_ended(result: GameState.MatchResult) -> void:
 	"""Match ended - show results screen"""
