@@ -24,26 +24,37 @@ signal ball_hit_paddle(paddle, player_id: int)
 signal ball_missed(player_id: int)
 
 func _ready() -> void:
-	# Create visual
-	_create_visuals()
+	# Visuals created after initialize() is called
+	pass
 
 func initialize(start_position: Vector2, start_velocity: Vector2) -> void:
 	"""Initialize ball"""
 	position = start_position
 	velocity = start_velocity
 	speed = velocity.length()
+	
+	# Create visuals now (after owner_id is set)
+	_create_visuals()
 
 func _create_visuals() -> void:
 	"""Create ball visuals"""
+	# Determine color based on ownership
+	var ball_color: Color
+	if owner_id == 1:
+		ball_color = Color.CYAN  # Player's ball = BLUE/CYAN (friendly)
+	else:
+		ball_color = Color.RED   # Enemy's ball = RED (enemy)
+	
 	# Sprite
 	sprite = Sprite2D.new()
 	sprite.texture = SpriteGenerator.generate_ball_texture(ball_type)
+	sprite.modulate = ball_color
 	add_child(sprite)
 	
-	# Trail effect
+	# Trail effect (matches ball color)
 	trail = Line2D.new()
 	trail.width = 3
-	trail.default_color = Color(1, 1, 1, 0.5)
+	trail.default_color = Color(ball_color.r, ball_color.g, ball_color.b, 0.6)
 	trail.z_index = -1
 	add_child(trail)
 
