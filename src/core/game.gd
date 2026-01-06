@@ -17,7 +17,8 @@ var deployment_manager  # Handles piece movement/rotation
 var game_hud
 
 ## Entities
-var ball
+var player_ball  # Player's ball (goes through enemy blocks)
+var ai_ball      # AI's ball (goes through player blocks)
 var player_paddle  # Bottom paddle (human)
 var ai_paddle      # Top paddle (AI)
 
@@ -152,9 +153,13 @@ func _input(event: InputEvent) -> void:
 			deployment_manager.move_selected_piece(event.position, board_manager)
 	
 	elif event is InputEventKey:
-		if event.pressed and event.keycode == KEY_R:
-			# R key - rotate selected piece
-			deployment_manager.rotate_selected_piece(board_manager)
+		if event.pressed:
+			if event.keycode == KEY_Q:
+				# Q key - rotate LEFT (counter-clockwise)
+				deployment_manager.rotate_selected_piece(board_manager, -1)
+			elif event.keycode == KEY_E:
+				# E key - rotate RIGHT (clockwise)
+				deployment_manager.rotate_selected_piece(board_manager, 1)
 
 
 func _on_phase_changed(new_phase: GameState.Phase) -> void:
@@ -165,36 +170,46 @@ func _on_phase_changed(new_phase: GameState.Phase) -> void:
 		_start_battle()
 
 func _start_battle() -> void:
-	"""Start battle phase with ball"""
+	"""Start battle phase with TWO balls (one per player)"""
 	print("=== BATTLE PHASE ===")
 	
-	# Create ball
 	var board_width = board_manager.board_width * board_manager.cell_size
 	var board_height = board_manager.board_height * board_manager.cell_size
 	
-	ball = Ball.new()
-	ball.initialize(
-		Vector2(board_width / 2.0, board_height / 2.0),
-		Vector2(0, 400)  # Start going DOWN toward player
+	# Create PLAYER'S ball (starts near player, attacks AI)
+	player_ball = Ball.new()
+	player_ball.owner_id = 1
+	player_ball.initialize(
+		Vector2(board_width / 2.0, board_height * 0.75),  # Bottom area
+		Vector2(randf_range(-100, 100), -400)  # Going UP toward AI
 	)
-	board_manager.add_child(ball)
+	board_manager.add_child(player_ball)
+	
+	# Create AI'S ball (starts near AI, attacks player)
+	ai_ball = Ball.new()
+	ai_ball.owner_id = 2
+	ai_ball.initialize(
+		Vector2(board_width / 2.0, board_height * 0.25),  # Top area
+		Vector2(randf_range(-100, 100), 400)  # Going DOWN toward player
+	)
+	board_manager.add_child(ai_ball)
 	
 	# Initialize ball physics system
 	ball_physics = BallPhysics.new()
-	ball_physics.set_ball(ball)
+	ball_physics.set_balls([player_ball, ai_ball])  # Pass both balls
 	ball_physics.set_board_manager(board_manager)
 	ball_physics.add_paddle(player_paddle)
 	ball_physics.add_paddle(ai_paddle)
 	ball_physics.ball_missed.connect(_on_ball_missed)
 	add_child(ball_physics)
 	
-	# Initialize AI paddle controller
+	# Initialize AI paddle controller (tracks AI's own ball)
 	paddle_ai = PaddleAI.new()
 	paddle_ai.set_paddle(ai_paddle)
-	paddle_ai.set_ball(ball)
+	paddle_ai.set_ball(ai_ball)  # AI tracks its own ball
 	add_child(paddle_ai)
 	
-	DebugLogger.log_info("Ball spawned, AI paddle controller active - FIGHT!", "GAME")
+	DebugLogger.log_info("TWO balls spawned - Each player has their own ball!", "GAME")
 
 func _process(delta: float) -> void:
 	"""Update game systems"""

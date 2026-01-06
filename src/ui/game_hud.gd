@@ -159,7 +159,7 @@ func _create_center_display() -> void:
 	
 	# Instructions
 	var instructions = Label.new()
-	instructions.text = "5 Pieces Pre-Placed at Bottom\nCLICK piece → DRAG to move → R to rotate"
+	instructions.text = "5 Pieces Pre-Placed at Bottom\nCLICK → DRAG to move | Q/E to rotate"
 	instructions.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	instructions.add_theme_color_override("font_color", Color.YELLOW)
 	instructions.add_theme_font_size_override("font_size", 18)

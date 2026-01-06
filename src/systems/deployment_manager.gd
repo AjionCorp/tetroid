@@ -149,13 +149,15 @@ func move_selected_piece(new_pos: Vector2, board_manager) -> void:
 	
 	selected_piece.anchor = new_grid_pos
 
-func rotate_selected_piece(board_manager) -> void:
-	"""Rotate the selected piece 90 degrees"""
+func rotate_selected_piece(board_manager, direction: int = 1) -> void:
+	"""Rotate the selected piece 90 degrees (direction: 1=clockwise, -1=counter-clockwise)"""
 	if not selected_piece:
 		print("No piece selected to rotate!")
 		return
 	
-	var new_rotation = (selected_piece.rotation + 1) % 4
+	var new_rotation = (selected_piece.rotation + direction) % 4
+	if new_rotation < 0:
+		new_rotation += 4  # Handle negative wrap-around
 	
 	print("Rotating " + selected_piece.type + " from " + str(selected_piece.rotation) + " to " + str(new_rotation))
 	
