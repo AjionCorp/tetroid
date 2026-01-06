@@ -110,7 +110,7 @@ func _handle_block_hit(block: Block) -> void:
 
 func _calculate_bounce_normal(ball_pos: Vector2, block_pos: Vector2) -> Vector2:
 	"""Calculate bounce normal from collision"""
-	var diff = ball_pos - (block_pos + Vector2(Constants.CELL_SIZE / 2, Constants.CELL_SIZE / 2))
+	var diff = ball_pos - (block_pos + Vector2(Constants.CELL_SIZE / 2.0, Constants.CELL_SIZE / 2.0))
 	
 	# Simple normal based on which side was hit
 	if abs(diff.x) > abs(diff.y):
@@ -136,7 +136,7 @@ func _respawn_ball() -> void:
 	var board_width = board_manager.board_width * board_manager.cell_size
 	var board_height = board_manager.board_height * board_manager.cell_size
 	
-	ball.position = Vector2(board_width / 2, board_height / 2)
+	ball.position = Vector2(board_width / 2.0, board_height / 2.0)
 	
 	# Random angle
 	var angle = randf_range(-PI/6, PI/6)
