@@ -140,7 +140,7 @@ func _play_destruction_animation() -> void:
 func _create_destruction_particles() -> void:
 	"""Create particle effect on destruction"""
 	var particles := CPUParticles2D.new()
-	particles.position = position
+	particles.position = global_position  # Use global position
 	particles.emitting = true
 	particles.one_shot = true
 	particles.amount = 20
@@ -157,12 +157,21 @@ func _create_destruction_particles() -> void:
 	particles.initial_velocity_max = 150
 	particles.gravity = Vector2(0, 300)
 	
-	# Add to parent
-	get_parent().add_child(particles)
+	# Add to scene root to avoid being picked up in block iteration
+	# Try to find effects container, fallback to scene root
+	var effects_node = get_node_or_null("/root/Main/Game/BoardManager/Effects")
+	if effects_node:
+		effects_node.add_child(particles)
+	else:
+		# Fallback: add to board parent
+		var board = get_parent().get_parent()
+		if board:
+			board.add_child(particles)
 	
 	# Auto-remove after lifetime
 	await get_tree().create_timer(particles.lifetime).timeout
-	particles.queue_free()
+	if is_instance_valid(particles):
+		particles.queue_free()
 
 func activate_ability() -> bool:
 	"""Activate block's ability"""

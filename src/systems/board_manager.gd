@@ -9,6 +9,7 @@ var board_height: int = 62  # 30 + 2 + 30
 var cell_size: int = 16
 
 var blocks_container: Node2D
+var effects_container: Node2D
 var screen_size: Vector2
 
 func _ready() -> void:
@@ -50,10 +51,16 @@ func create_board() -> void:
 	# Draw grid
 	_draw_grid()
 	
-	# Container for blocks
+	# Container for blocks (only Block objects)
 	blocks_container = Node2D.new()
 	blocks_container.name = "Blocks"
 	add_child(blocks_container)
+	
+	# Container for visual effects (particles, etc)
+	effects_container = Node2D.new()
+	effects_container.name = "Effects"
+	effects_container.z_index = 50
+	add_child(effects_container)
 	
 	# Draw neutral zone
 	_draw_neutral_zone()

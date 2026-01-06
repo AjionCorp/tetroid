@@ -70,7 +70,12 @@ func _check_block_collision() -> void:
 	var blocks = board_manager.get_blocks()
 	var ball_rect = Rect2(ball.position.x - 4, ball.position.y - 4, 8, 8)
 	
-	for block in blocks:
+	for node in blocks:
+		# Only check Block objects (skip particles and other nodes)
+		if not node is Block:
+			continue
+		
+		var block = node as Block
 		if not is_instance_valid(block) or block.is_destroyed:
 			continue
 		
