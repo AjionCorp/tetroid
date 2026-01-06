@@ -121,13 +121,13 @@ func _check_block_collision(ball) -> void:
 			continue
 		
 		# OWNERSHIP CHECK:
-		# - Your ball passes through enemy blocks (owner_id different)
-		# - Your ball bounces off your own blocks (owner_id same)
+		# - Your ball PASSES THROUGH your own blocks (owner_id same)
+		# - Your ball BOUNCES OFF enemy blocks (owner_id different) and damages them
 		if ball.owner_id == block.owner_id:
 			# Ball passes through own blocks - no collision
 			continue
 		
-		# Only collide with ENEMY blocks
+		# Ball hits ENEMY block - bounce and damage!
 		var block_rect = Rect2(
 			block.position.x,
 			block.position.y,
